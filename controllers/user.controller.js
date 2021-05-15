@@ -1,4 +1,8 @@
-import {response} from 'express'
+import {response} from 'express';
+import dotenv from 'dotenv';
+
+dotenv.config();
+const port= process.env.PORT || 8080;
 
 const userGet = (req, res = response) => {   
     const {id= 0, 
@@ -8,7 +12,10 @@ const userGet = (req, res = response) => {
     .json({
         ok: true,
         message:`GET API Controller: user`,
-        body: {id, value}
+        body: {
+            id, 
+            value,
+            port}
     });    
 };
 
