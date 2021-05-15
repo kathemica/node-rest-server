@@ -1,22 +1,27 @@
-import dotenv from 'dotenv';
-import express from "express";
-import path from 'path';
-import { fileURLToPath } from 'url';
+// import dotenv from 'dotenv';
+// import path from 'path';
+// import { fileURLToPath } from 'url';
+
+import {Server} from './models/Server.js';
+
+
 // import hbs from 'hbs';
 
 // ------------------------------------------------
 // CONFIG
 // ------------------------------------------------
 //adding environment var
-dotenv.config();
-process.env.PORT = process.env.PORT || 8080;
+// dotenv.config();
+// process.env.PORT = process.env.PORT || 8080;
+
+const app = new Server();
 
 //adding express
-const app = express();
-app.use(express.json());
-app.use(express.urlencoded({
-  extended: true
-}));
+// const app = express();
+// app.use(express.json());
+// app.use(express.urlencoded({
+//   extended: true
+// }));
 
 //adding public folder, default home
 // app.use(express.static('public', {
@@ -24,8 +29,8 @@ app.use(express.urlencoded({
 // }));
 
 //adding dirname and filename path
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
 //adding render engine - HBS handlebars/
 // app.set('view engine', 'hbs');
@@ -36,12 +41,14 @@ const __dirname = path.dirname(__filename);
 //     title: 'Node course'
 // };
 
+app.start();
+
 // ------------------------------------------------
 // Serving
 // ------------------------------------------------
-app.get("/", (req, res, next) => {
-    res.send(`hello world at port ${process.env.PORT}`);
-});
+// app.get("/", (req, res, next) => {
+//     res.send(`hello world at port ${process.env.PORT}`);
+// });
 
 // app.get(['/', '/index', '/home'], (req, res, next) => {
 //     res.render(`home`, pageData);
@@ -62,6 +69,6 @@ app.get("/", (req, res, next) => {
 // ------------------------------------------------
 // Running
 // ------------------------------------------------
-app.listen(process.env.PORT, () => {
-  console.log(`Server is running at port ${process.env.PORT}`);
-});
+// app.listen(process.env.PORT, () => {
+//   console.log(`Server is running at port ${process.env.PORT}`);
+// });
