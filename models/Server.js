@@ -1,10 +1,11 @@
 import express from "express";
-import dotenv from 'dotenv';
+// import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import {userRouter} from '../routes/user.routes.js';
+import { userRouter } from '../routes/user.routes.js';
+import { dbConnection } from '../database/config.db.js';
 
 class Server{
     #app = null;
@@ -16,15 +17,16 @@ class Server{
     constructor() {
         this.__filename = fileURLToPath(import.meta.url);
         this.__dirname = path.dirname(this.__filename);
-        this.userAPIPath= '/api/user'
+        this.userAPIPath= '/api/user';
+        
+        //config
+        this.#connectDB();
 
         this.#app= express();
-
-        //config
-        dotenv.config();
+                
         this.#port = process.env.PORT || 8080;        
 
-        this.#middlewares();        
+        this.#middlewares();                   
     }
 
     #middlewares(){
@@ -45,6 +47,11 @@ class Server{
         
         //adding routes to server
         this.#app.use(this.userAPIPath, userRouter);
+    }
+
+    
+    async #connectDB(){
+        await dbConnection();
     }
    
     start(){
