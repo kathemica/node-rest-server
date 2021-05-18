@@ -104,3 +104,6 @@ dist
 .tern-port
 /.env
 /node_modules
+/certs/server_root_CA.crt
+/certs/client.pem
+/certs/client.key

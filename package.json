@@ -4,7 +4,7 @@
   "description": "Node REST server",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon app",
+    "dev": "set NODE_ENV=developer&&nodemon app",
     "start": "node app.js"
   },
   "repository": {

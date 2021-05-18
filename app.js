@@ -1,8 +1,9 @@
-import dotenv from 'dotenv';
 import {Server} from './models/Server.js';
 
-dotenv.config();
-console.log(process.env);
+
+// if (process.env.NODE_ENV !== 'production'){
+//     dotenv.config();
+// };
 
 const app = new Server();
 
