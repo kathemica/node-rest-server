@@ -43,16 +43,17 @@ const authLogin = async (req, res = response) => {
       user,
       token,
     });
-    
+
   } catch (error) {
     console.log(`Error: ${error}`);
+
     return responseObjectBuilder(
       res,
       500,
       true,
       'Failure',
-      error.message + '\n' + error.name,
-      error.errors
+      error.message,
+      error
     );
   }
 };
