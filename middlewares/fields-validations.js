@@ -17,6 +17,4 @@ const fieldValidation = (req, res, next) => {
    next();
 };
 
-export{
-  fieldValidation
-}
+export default fieldValidation;

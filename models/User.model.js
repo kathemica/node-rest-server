@@ -38,11 +38,12 @@ const UserSchema = Schema ({
 });
 
 //adjustment for response object
-//must be used function due "this" have to be used
+//must be used function due "this" have to be used for return data
 UserSchema.methods.toJSON = function(){
   //extract _v and password for response
-  const { __v, password, ...userObject} = this.toObject();
+  const { __v, password, _id, ...userObject} = this.toObject();
 
+  userObject.uuid= _id;
   //getting filtered object
   return userObject;
 }
