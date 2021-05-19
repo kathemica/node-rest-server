@@ -43,14 +43,15 @@ const authLogin = async (req, res = response) => {
       user,
       token,
     });
+    
   } catch (error) {
     console.log(`Error: ${error}`);
     return responseObjectBuilder(
       res,
       500,
       true,
-      error.message,
-      error.name,
+      'Failure',
+      error.message + '\n' + error.name,
       error.errors
     );
   }
