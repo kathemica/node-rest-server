@@ -9,7 +9,7 @@ const generateJWT = (uuid = "") => {
       (err, token) => {
         if (err) {
           console.log(err);
-          reject(`Couldn't generate jwt token, UUID: ${uuid}, Secret:${SECRETJWT}`);
+          reject(`Couldn't generate jwt token`);
         } else {
           resolve(token);
         }
