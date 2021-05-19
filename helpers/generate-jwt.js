@@ -3,13 +3,13 @@ import { SECRETJWT } from "../config/config.js";
 
 const generateJWT = (uuid = "") => {
   return new Promise((resolve, reject) => {
-    const payload = { uuid };
+    const payload = { uuid };    
 
-    jwt.sign(payload,SECRETJWT,{expiresIn: "4h"},
+    jwt.sign(payload, SECRETJWT, {expiresIn: "4h"},
       (err, token) => {
         if (err) {
           console.log(err);
-          reject("Couldn't generate jwt token");
+          reject(`Couldn't generate jwt token, UUID: ${uuid}, Secret:${SECRETJWT}`);
         } else {
           resolve(token);
         }
