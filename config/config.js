@@ -17,12 +17,12 @@ if (process.env.NODE_ENV !== "production") {
   KEY_CERT = process.env.KEY_CERT || "";
   PEM_CERT = process.env.PEM_CERT || "";
   CA_TOKEN = process.env.CA_TOKEN || "";
-  IS_TLS = _.isEqual(process.env.IS_TLS, "true") ? true : false;
-  SECRETJWT = process.env.SECRETJWT;
+  IS_TLS = _.isEqual(process.env.IS_TLS, "true") ? true : false;  
 }
 
 PORT = process.env.PORT || 8080;
 ATLAS_MONGO_URL = process.env.ATLAS_MONGO_URL;
+SECRETJWT = process.env.SECRETJWT;
 
 export {
   PORT,
