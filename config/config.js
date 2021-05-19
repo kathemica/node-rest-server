@@ -18,7 +18,7 @@ if (process.env.NODE_ENV !== "production") {
   PEM_CERT = process.env.PEM_CERT || "";
   CA_TOKEN = process.env.CA_TOKEN || "";
   IS_TLS = _.isEqual(process.env.IS_TLS, "true") ? true : false;
-  SECRETJWT = process.env.IS_TLS;
+  SECRETJWT = process.env.SECRETJWT;
 }
 
 PORT = process.env.PORT || 8080;
