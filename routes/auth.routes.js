@@ -20,8 +20,6 @@ authRouter.post("/googlelogin", [
     fieldValidation
 ],authGoogleLogin);
 
-
-
 export {
     authRouter
 }
