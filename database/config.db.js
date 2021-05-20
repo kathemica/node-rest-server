@@ -1,13 +1,14 @@
 import mongoose from "mongoose";
 import colors from "colors";
 import fs from "fs";
+
 import {
   CA_TOKEN,
   CA_CERT,
   KEY_CERT,
   PEM_CERT,
   ATLAS_MONGO_URL,
-  IS_TLS,
+  IS_TLS 
 } from "../config/config.js";
 
 const dbConnection = async () => {

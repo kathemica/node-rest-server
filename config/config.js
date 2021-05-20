@@ -9,6 +9,9 @@ let PEM_CERT = "";
 let CA_TOKEN = "";
 let IS_TLS = false;
 let SECRETJWT = "";
+let GOOGLE_CLIENT_ID = "";
+let GOOGLE_SECRET_ID = "";
+
 
 if (process.env.NODE_ENV !== "production") {
   dotenv.config();
@@ -23,6 +26,8 @@ if (process.env.NODE_ENV !== "production") {
 PORT = process.env.PORT || 8080;
 ATLAS_MONGO_URL = process.env.ATLAS_MONGO_URL;
 SECRETJWT = process.env.SECRETJWT;
+GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+GOOGLE_SECRET_ID = process.env.GOOGLE_SECRET_ID;
 
 export {
   PORT,
@@ -33,4 +38,6 @@ export {
   PEM_CERT,
   IS_TLS,
   SECRETJWT,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_SECRET_ID
 };
