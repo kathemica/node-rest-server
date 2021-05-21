@@ -2,10 +2,10 @@
   "name": "node-rest-server",
   "version": "1.0.0",
   "description": "Node REST server",
-  "main": "app.js",
+  "main": "src/app.js",
   "scripts": {
-    "dev": "set NODE_ENV=developer&&nodemon app",
-    "start": "node app.js"
+    "dev": "set NODE_ENV=developer&&nodemon ./src/app",
+    "start": "node ./src/app"
   },
   "repository": {
     "type": "git",
@@ -17,6 +17,9 @@
     "rest-server",
     "heroku"
   ],
+  "engines": {
+    "node": ">=15.11.0"
+  },
   "author": "Katherine Aguirre",
   "license": "Apache-2.0",
   "bugs": {
@@ -33,9 +36,15 @@
     "express": "^4.17.1",
     "express-validator": "^6.11.1",
     "google-auth-library": "^7.0.4",
+    "helmet": "^4.6.0",
+    "joi": "^17.4.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.20",
-    "mongoose": "^5.12.9",
+    "mongoose": "^5.12.9",    
+    "swagger-jsdoc": "^7.0.0-rc.6",
+    "swagger-ui-express": "^4.1.6"
+  },
+  "devDependencies": {
     "nodemon": "^2.0.7"
   }
 }

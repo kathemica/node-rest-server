@@ -12,6 +12,8 @@ const UserSchema = Schema ({
   },
   email: {
     type: String,
+    trim: true,
+    lowercase: true,
     required: [true, 'Email is mandatory']
   },
   password: {
