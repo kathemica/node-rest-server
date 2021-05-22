@@ -1,16 +1,13 @@
 import { Router } from "express";
 import { check } from "express-validator";
-
-import {
-  validateJWT,
-  fieldValidation,
-  validateSpecificRoles
-} from "../middlewares/index.js";
+import auth from "../middlewares/auth.js";
+import fieldValidation from "../validations/fields.validation.js";
 
 import {
   isValidRol,
   isEmailUnique,
   existsID,
+  weakPassword,
 } from "../helpers/db-validators.js";
 
 import {
@@ -25,15 +22,16 @@ const router = Router();
 
 router
   .route('/')
-  .get(userGet)
+  .get([
+      auth("ADMIN_ROLE", "USER_ROLE", "SALES_ROLE")
+    ],userGet)
   .post([
+      auth("ADMIN_ROLE"),
       check("firstName", "First name is required").not().isEmpty(),
       check("lastName", "Last name is required").not().isEmpty(),
       check("email", "Invalid email").isEmail(),
-      check("email").custom(isEmailUnique),
-      check("password", "Password should be greather than 6 chars").isLength({
-        min: 6,
-      }),
+      check("email").custom(isEmailUnique),            
+      check("password").custom(weakPassword),
       check("role").custom(isValidRol),
       fieldValidation,
     ],
@@ -44,6 +42,7 @@ router
   .route('/:id') 
   .get(  
     [
+      auth("ADMIN_ROLE", "USER_ROLE", "SALES_ROLE"),
       check("id", "Id is not valid").isMongoId(),
       check("id").custom(existsID),
       fieldValidation,
@@ -52,12 +51,12 @@ router
   )
   .patch(
     [
+      auth("ADMIN_ROLE"),
       check("id", "Id is not valid").isMongoId(),
       check("id").custom(existsID),
       check("email", "Invalid email").optional().isEmail(),
-      check("password", "Password should be greather than 6 chars")
-        .optional()
-        .isLength({ min: 6 }),
+      check("email").optional().custom(isEmailUnique),
+      check("password").optional().custom(weakPassword),      
       check("role").optional().custom(isValidRol),
       fieldValidation,
     ],
@@ -65,8 +64,8 @@ router
   )
   .delete(
     [
-      validateJWT,
-      validateSpecificRoles("ADMIN_ROLE"),
+      auth("ADMIN_ROLE"),
+      check("id", "Id is empty").not().isEmpty(),
       check("id", "Id is not valid").isMongoId(),
       check("id").custom(existsID),
       fieldValidation,

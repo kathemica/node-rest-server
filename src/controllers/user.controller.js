@@ -3,6 +3,9 @@ import bcryptjs from "bcryptjs";
 import _ from "lodash";
 import Users from "../models/User.model.js";
 import responseObjectBuilder from "../helpers/functions.helper.js";
+import httpStatus from "http-status";
+import ApiError from "../helpers/ApiError.js";
+import logger from '../config/logger.js';
 
 //get one uses
 const userGetOne = async (req, res = response) => {
@@ -13,7 +16,7 @@ const userGetOne = async (req, res = response) => {
 
     return responseObjectBuilder(res, 200, true, `Success`, "", user);
   } catch (error) {
-    console.log(`Error: ${error}`);
+    logger.error(`Error: ${error}`);
     return responseObjectBuilder(
       res,
       500,
@@ -44,7 +47,7 @@ const userGet = async (req, res = response) => {
       users,
     });
   } catch (error) {
-    console.log(`Error: ${error}`);
+    logger.error(`Error: ${error}`);
     return responseObjectBuilder(
       res,
       500,
@@ -70,7 +73,7 @@ const userPost = async (req, res = response) => {
 
     return responseObjectBuilder(res, 200, true, `Success`, "", user);
   } catch (error) {
-    console.log(`Error: ${error}`);
+    logger.error(`Error: ${error}`);
     return responseObjectBuilder(
       res,
       500,
@@ -109,7 +112,7 @@ const userPatch = async (req, res = response) => {
       user
     );
   } catch (error) {
-    console.log(`Error: ${error}`);
+    logger.error(`Error: ${error}`);
     return responseObjectBuilder(
       res,
       500,
@@ -126,7 +129,7 @@ const userDelete = async (req, res = response) => {
   try {
     const { id } = req.params;
 
-    // console.log(adminUser);
+    console.log(`ID: ${id}`);
 
     const user = await Users.findByIdAndUpdate(
       id,
@@ -143,7 +146,9 @@ const userDelete = async (req, res = response) => {
       user
     );
   } catch (error) {
-    console.log(`Error: ${error}`);
+
+    logger.error(`Error: ${error}`);
+    // new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error.message, error.errors);
     return responseObjectBuilder(
       res,
       500,

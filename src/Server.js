@@ -4,10 +4,12 @@ import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUi from"swagger-ui-express"; 
 import helmet from "helmet";
 
+import logger from "./config/logger.js";
+import responseObjectBuilder from "./helpers/functions.helper.js";
 import { dbConnection } from './database/config.db.js';
-import { PORT, APP_PATH } from './config/config.js';
 import { userRouter } from './routes/user.routes.js';
 import { authRouter } from './routes/auth.routes.js';
+import { PORT, APP_PATH } from './config/config.app.js';
 
 class Server{
     #app = null;
@@ -69,9 +71,8 @@ class Server{
         this.#app.use(cors());
 
         // set security HTTP headers
-        this.#app.use(helmet());
-        // this.#app.use(helmet.hidePoweredBy());
-        // this.#app.use(helmet.noSniff());
+        // this.#app.use(helmet());        
+        this.#app.use(helmet({contentSecurityPolicy:false}));        
         // this.#app.use(helmet.contentSecurityPolicy({
         //     directives: {
         //      defaultSrc: ["'self'", "apis.google.com"],
@@ -92,27 +93,8 @@ class Server{
              scriptSrc: ["'self'","https://apis.google.com"],             
              fontSrc:["'self'",'fonts.googleapis.com']
            }
-          }));
-          
-          */
-
-        // this.#app.use(helmet.contentSecurityPolicy({            
-        //     directives:{
-        //         defaultSrc:[
-        //             "'self'",                     
-        //             'https://*.google.com'],
-        //         scriptSrc:[
-        //             "'self'",
-        //             'unsafe-inline',                    
-        //             'https://*.google.com'],
-        //         styleSrc:[
-        //             "'self'", 
-        //             'unsafe-inline',                    
-        //             'https://*.google.com'],
-        //         fontSrc:["'self'", 'fonts.gstatic.com']
-        //         }
-        //     }
-        // ));        
+          }));          
+          */     
 
         //parsing body        
         this.#app.use(express.json());
@@ -127,22 +109,27 @@ class Server{
     }
 
     #routes(){
-        //adding routes to server        
-        this.#app.get("*", (req, res, next) => {                
-            res.sendFile(APP_PATH + '/src/public/index.html')
-        });
+        //adding routes to server                
         this.#app.use(this.authAPIPath, authRouter);
         this.#app.use(this.userAPIPath, userRouter);                       
+
+        this.#app.use((req, res, next) => {
+            next(responseObjectBuilder(res, 501, true, 'Not Implemented', 'Method not implemented', null));
+        });
     }
     
     #connectDB( ){
-         dbConnection();
+        try {
+            dbConnection();   
+        } catch (error) {
+            logger.error(`Error loading db, details:${error}`);    
+        }         
     }
    
     start(){
         this.#app.listen(this.#port, () => {
-            console.log(`Server is running at port: ${this.#port}`);
-          });
+            logger.info(`Server is running at port: ${this.#port}`);
+        });
     }
 }
 

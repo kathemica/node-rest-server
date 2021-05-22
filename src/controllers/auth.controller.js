@@ -1,61 +1,44 @@
 import { response } from "express";
 import bcryptjs from "bcryptjs";
 import _ from "lodash";
+import httpStatus from "http-status";
 
 import { generateJWT } from "../helpers/generate-jwt.js";
 import Users from "../models/User.model.js";
 import responseObjectBuilder from "../helpers/functions.helper.js";
 import googleVerify from "../helpers/google-verify.js";
+import ApiError from "../helpers/ApiError.js";
 
 //get one uses
 const authLogin = async (req, res = response) => {
   try {
     const { email, password } = req.body;
 
-    const user = await Users.findOne({ email: email, isActive: true });
+    let user = await Users.findOne({ email: email, isActive: true });
 
     if (!user) {
-      return responseObjectBuilder(
-        res,
-        400,
-        true,
-        "Failure",
-        "Account is disabled or doesn't exists",
-        null
-      );
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Account is disabled or doesn\'t exists');      
     }
 
     const isValidPassword = bcryptjs.compareSync(password, user.password);
 
     if (!isValidPassword) {
-      return responseObjectBuilder(
-        res,
-        400,
-        true,
-        "Failure",
-        "Password is invalid",
-        null
-      );
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Password is invalid');      
     }
 
-    const token = await generateJWT(user.id);
+    user.token = await generateJWT(user.id);    
+
+    user = await Users.findByIdAndUpdate(user.id, {token: user.token}, {
+      returnOriginal: false,
+    });    
 
     return responseObjectBuilder(res, 200, true, "Success", "", {
       user,
-      token,
+      token: user.token,
     });
 
-  } catch (error) {
-    console.log(`Error: ${error}`);
-
-    return responseObjectBuilder(
-      res,
-      500,
-      true,
-      'Failure',
-      error.message,
-      error
-    );
+  } catch (error) {    
+    return responseObjectBuilder(res, error.statusCode, true, error.message);
   }
 };
 
@@ -82,23 +65,15 @@ const authGoogleLogin = async (req, res = response) => {
     }; 
     
     if(!user.isActive){
-      throw new Error('User is inactive, can\'t login');
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Account is disabled'); 
     }
 
     const token = await generateJWT(user.id);
 
     return responseObjectBuilder(res, 200, true, "Success", "Google Auth success", {user, token});    
   } catch (error) {
-    console.log(`Error: ${error}`);
 
-    return responseObjectBuilder(
-      res,
-      400,
-      true,
-      'Failure',
-      error.message,
-      error
-    );
+    return responseObjectBuilder(res, error.statusCode, true, error.message);
   }
 }
 

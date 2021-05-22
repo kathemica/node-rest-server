@@ -1,30 +1,16 @@
 import mongoose from "mongoose";
-import colors from "colors";
 import fs from "fs";
-
-import {
-  CA_TOKEN,
-  CA_CERT,
-  KEY_CERT,
-  PEM_CERT,
-  ATLAS_MONGO_URL,
-  IS_TLS 
-} from "../config/config.js";
+import logger from '../config/logger.js';
+import {mongoose_config} from "../config/config.app.js";
 
 const dbConnection = async () => {
   try {
-    const sslCA = IS_TLS ? [fs.readFileSync(CA_CERT)] : "";
-    const sslPass = IS_TLS ? CA_TOKEN : "";
-    const sslKey = IS_TLS ? fs.readFileSync(KEY_CERT) : "";
-    const sslCert = IS_TLS ? fs.readFileSync(PEM_CERT) : "";
+    const sslCA = mongoose_config.is_tls ? [fs.readFileSync(mongoose_config.CA_CERT)] : "";
+    const sslPass = mongoose_config.is_tls ? mongoose_config.CA_TOKEN : "";
+    const sslKey = mongoose_config.is_tls ? fs.readFileSync(mongoose_config.KEY_CERT) : "";
+    const sslCert = mongoose_config.is_tls ? fs.readFileSync(mongoose_config.PEM_CERT) : "";
 
     const options = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-      useFindAndModify: false,
-      sslValidate: false,
-      tlsAllowInvalidHostnames: true,
       ssl: true,
       sslCA,
       sslPass,
@@ -32,10 +18,11 @@ const dbConnection = async () => {
       sslCert,
     };
 
-    await mongoose.connect(ATLAS_MONGO_URL, options);
-
-    console.log(`Connected to db`.blue);
+    await mongoose.connect(mongoose_config.url, {...options, ...mongoose_config.options});
+    
+    logger.info('Connected to MongoDB');    
   } catch (error) {
+    logger.error(`Error loading db, details:${error}`);
     throw new Error(`Error loading db, details:${error}`);
   }
 };

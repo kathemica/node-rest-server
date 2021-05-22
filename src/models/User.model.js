@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 const { Schema, model } = mongoose;
 
+import validator from 'validator';
+
 const UserSchema = Schema ({
   firstName: {
       type: String,
@@ -10,15 +12,39 @@ const UserSchema = Schema ({
     type: String,
     required: [true, 'lastName is mandatory']
   },
+  age:{
+    type: Number,
+    validate(value){
+      if (value < 0){
+        throw new Error('Age mus be a positive number')
+      }
+    }
+  },
   email: {
     type: String,
     trim: true,
     lowercase: true,
-    required: [true, 'Email is mandatory']
+    required: [true, 'Email is mandatory'],
+    validate(value){
+      if (!validator.isEmail(value)){
+        throw new Error('Email is invalid')
+      }
+    }    
   },
   password: {
     type: String,
-    required: [true, 'Pasdword is mandatory']
+    required: [true, 'Pasdword is mandatory'],
+    validate(value){
+      if (!validator.isStrongPassword(value, {
+        minLength: 8, 
+        minLowercase: 1, 
+        minUppercase: 1,
+        minNumbers: 1, 
+        minSymbols: 1
+      })){
+        throw new Error('Password is weak')
+      }
+    }
   },
   image: {
     type: String
@@ -37,6 +63,11 @@ const UserSchema = Schema ({
     type: Boolean,
     default: false,
     immutable: true
+  },
+  token: {
+    type: String,    
+    trim: true,   
+    default: null
   }
 });
 
