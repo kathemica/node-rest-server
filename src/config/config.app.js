@@ -28,7 +28,7 @@ const envVarsSchema = Joi.object()
     KEY_CERT: Joi.string().default('').description('The path for Key Cert file'),
     PEM_CERT: Joi.string().default('').description('The path for PEM Cert file'),
     CA_TOKEN: Joi.string().default('').description('The key for open CA cert file'),
-    IS_TLS: Joi.string().default(false).description('Shpuld I Use TLS for mongo?'),
+    IS_TLS: Joi.boolean().default(false).description('Should I Use TLS for mongo?'),
     GOOGLE_CLIENT_ID: Joi.string().description('Cliend ID for google Auth API '),
     GOOGLE_SECRET_ID: Joi.string().description('The key for access Google API Service'),
   })
