@@ -11,11 +11,11 @@ const dbConnection = async () => {
     const sslCert = mongoose_config.is_tls ? fs.readFileSync(mongoose_config.PEM_CERT) : "";
 
     const options = {
-      ssl: true,
       sslCA,
       sslPass,
       sslKey,
       sslCert,
+      ssl: true
     };
 
     await mongoose.connect(mongoose_config.url, {...options, ...mongoose_config.options});
