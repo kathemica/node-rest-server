@@ -119,11 +119,11 @@ class Server{
     }
     
     #connectDB( ){
-        try {
+        // try {
             dbConnection();   
-        } catch (error) {
-            logger.error(`Error loading db, details:${error}`);    
-        }         
+        // } catch (error) {
+        //     logger.error(`Error loading db, details:${error}`);    
+        // }         
     }
    
     start(){

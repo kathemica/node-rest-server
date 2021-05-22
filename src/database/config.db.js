@@ -22,8 +22,9 @@ const dbConnection = async () => {
     
     logger.info('Connected to MongoDB');    
   } catch (error) {
-    logger.error(`Error loading db, details:${error}`);
-    throw new Error(`Error loading db, details:${error}`);
+    logger.info('Error on DB:'); 
+    logger.error(error);
+    // throw new Error(`Error loading db, details:${error}`);
   }
 };
 
