@@ -31,6 +31,8 @@ const envVarsSchema = Joi.object()
     IS_TLS: Joi.boolean().default(false).description('Should I Use TLS for mongo?'),
     GOOGLE_CLIENT_ID: Joi.string().description('Cliend ID for google Auth API '),
     GOOGLE_SECRET_ID: Joi.string().description('The key for access Google API Service'),
+    npm_package_version: Joi.string().default('').description('Version from package.json'),
+    
   })
   .unknown();
 
@@ -41,9 +43,8 @@ if (error) {
 }
 
 const APP_PATH =envVars.APP_PATH;
-
+const VERSION =envVars.npm_package_version;
 const env= envVars.NODE_ENV;
-
 const PORT= envVars.PORT;
 
 const mongoose_config= {
@@ -90,6 +91,7 @@ const email_config= {
 
 export  {  
   APP_PATH,
+  VERSION,
   env,
   PORT,
   mongoose_config,

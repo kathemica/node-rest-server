@@ -1,7 +1,5 @@
 import express from "express";
 import cors from 'cors';
-import swaggerJsDoc from "swagger-jsdoc";
-import swaggerUi from"swagger-ui-express"; 
 import helmet from "helmet";
 
 import logger from "./config/logger.js";
@@ -9,12 +7,12 @@ import responseObjectBuilder from "./helpers/functions.helper.js";
 import { dbConnection } from './database/config.db.js';
 import { userRouter } from './routes/user.routes.js';
 import { authRouter } from './routes/auth.routes.js';
-import { PORT, APP_PATH } from './config/config.app.js';
+import { docsRouter } from "./routes/docs.routes.js";
+import { PORT, env } from './config/config.app.js';
 
 class Server{
     #app = null;
-    #port= null; 
-    #swaggerDocs = null;
+    #port= null;     
     userPath= '';
     authPath= '';
     docAPIPath= '';
@@ -29,40 +27,25 @@ class Server{
                 
         this.#port = PORT;   
         
-        this.#connectDB();        
-            
+        this.#connectDB();                        
+
         this.#middlewares();    
 
-        this.#swaggerDocConfig();
         this.#routes();                   
-    }
-
-    async #swaggerDocConfig(){
-        // Extended: https://swagger.io/specification/#infoObject
-        const swaggerOptions = {
-            swaggerDefinition:{
-                openapi: '3.0.0',
-                info: {
-                    title: 'node-rest-server API documentation',
-                    version: '1.0.0',
-                    license: {
-                            name: 'Apache-2.0',
-                            url: 'https://github.com/kathemica/node-rest-server/blob/V1.0.1/LICENSE',
-                        },
-                },
-                servers: [
-                    {
-                        url: `http://localhost:8051`,
-                    },
-                ],
-            },
-            apis: [                
-                APP_PATH + '/routes/*.js',                 
-                APP_PATH + '/doc/*.yml', 
-            ]
-        }            
-        this.#swaggerDocs = await swaggerJsDoc(swaggerOptions);      
-        this.#app.use(this.docAPIPath, swaggerUi.serve, swaggerUi.setup(this.#swaggerDocs));   
+    }    
+    
+    #routes(){
+        //adding routes to server                
+        this.#app.use(this.authAPIPath, authRouter);
+        this.#app.use(this.userAPIPath, userRouter);  
+        
+        if (env === 'development') {        
+            this.#app.use(this.docAPIPath, docsRouter);                       
+        }                     
+        
+        this.#app.use((req, res, next) => {
+            next(responseObjectBuilder(res, 501, true, 'Not Implemented', 'Method not implemented', null));
+        });
     }
 
     #middlewares(){
@@ -72,6 +55,7 @@ class Server{
 
         // set security HTTP headers
         // this.#app.use(helmet());        
+        //TODO: add helmet CSP policy
         this.#app.use(helmet({contentSecurityPolicy:false}));        
         // this.#app.use(helmet.contentSecurityPolicy({
         //     directives: {
@@ -108,22 +92,12 @@ class Server{
         }));            
     }
 
-    #routes(){
-        //adding routes to server                
-        this.#app.use(this.authAPIPath, authRouter);
-        this.#app.use(this.userAPIPath, userRouter);                       
-
-        this.#app.use((req, res, next) => {
-            next(responseObjectBuilder(res, 501, true, 'Not Implemented', 'Method not implemented', null));
-        });
-    }
-    
     #connectDB( ){
-        // try {
+        try {
             dbConnection();   
-        // } catch (error) {
-        //     logger.error(`Error loading db, details:${error}`);    
-        // }         
+        } catch (error) {
+             logger.error(`Error loading db, details:${error}`);    
+        }         
     }
    
     start(){

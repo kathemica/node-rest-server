@@ -36,7 +36,7 @@ export {
 
 /**
  * @swagger
- * /login:
+ * /api/auth/login:
  *   post:
  *     summary: Login
  *     tags: [Auth]
@@ -69,7 +69,7 @@ export {
  *               properties:
  *                 user:
  *                   $ref: '#/components/schemas/User'
- *                 tokens:
+ *                 token:
  *                   $ref: '#/components/schemas/AuthTokens'
  *       "401":
  *         description: Invalid email or password

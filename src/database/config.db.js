@@ -25,7 +25,7 @@ const dbConnection = async () => {
   } catch (error) {
     logger.info('Error on DB:'); 
     logger.error(error);
-    // throw new Error(`Error loading db, details:${error}`);
+    throw new Error(`Error loading db, details:${error}`);
   }
 };
 
