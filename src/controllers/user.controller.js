@@ -14,17 +14,10 @@ const userGetOne = async (req, res = response) => {
 
     const user = await Users.findById(id);
 
-    return responseObjectBuilder(res, 200, true, `Success`, "", user);
+    return responseObjectBuilder(res, httpStatus.OK, true, `Success`, `Get one success`, user);
   } catch (error) {
     logger.error(`Error: ${error}`);
-    return responseObjectBuilder(
-      res,
-      500,
-      true,
-      error.message,
-      error.name,
-      error.errors
-    );
+    return responseObjectBuilder(res, httpStatus.INTERNAL_SERVER_ERROR, `Error`, `Get one failure`, error.message);
   }
 };
 
@@ -42,20 +35,13 @@ const userGet = async (req, res = response) => {
       Users.find(query).skip(Number(from)).limit(Number(limit)),
     ]);
 
-    return responseObjectBuilder(res, 200, true, `Success`, "", {
+    return responseObjectBuilder(res, httpStatus.OK, `Success`, `Get all success`, "", {
       total,
       users,
     });
   } catch (error) {
     logger.error(`Error: ${error}`);
-    return responseObjectBuilder(
-      res,
-      500,
-      true,
-      error.message,
-      error.name,
-      error.errors
-    );
+    return responseObjectBuilder(res, httpStatus.INTERNAL_SERVER_ERROR, `Error`, `Get all failure`, error.message);
   }
 };
 
@@ -71,17 +57,10 @@ const userPost = async (req, res = response) => {
 
     await user.save();
 
-    return responseObjectBuilder(res, 200, true, `Success`, "", user);
+    return responseObjectBuilder(res, httpStatus.OK, `Success`, `Create success`,  "", user);
   } catch (error) {
     logger.error(`Error: ${error}`);
-    return responseObjectBuilder(
-      res,
-      500,
-      true,
-      error.message,
-      error.name,
-      error.errors
-    );
+    return responseObjectBuilder(res, httpStatus.INTERNAL_SERVER_ERROR, `Error`, `Create failure`, error.message);
   }
 };
 
@@ -103,9 +82,9 @@ const userPatch = async (req, res = response) => {
 
     return responseObjectBuilder(
       res,
-      200,
-      true,
+      httpStatus.OK,
       `Success`,
+      `Update success`, 
       !_.isUndefined(data.isGoogle)
         ? "'Google tag' field is readonly, won't be changed"
         : "",
@@ -113,23 +92,14 @@ const userPatch = async (req, res = response) => {
     );
   } catch (error) {
     logger.error(`Error: ${error}`);
-    return responseObjectBuilder(
-      res,
-      500,
-      true,
-      error.message,
-      error.name,
-      error.errors
-    );
+    return responseObjectBuilder(res, httpStatus.INTERNAL_SERVER_ERROR, `Error`, `Update failure`, error.message);
   }
 };
 
 //Delete a user
 const userDelete = async (req, res = response) => {
   try {
-    const { id } = req.params;
-
-    console.log(`ID: ${id}`);
+    const { id } = req.params;    
 
     const user = await Users.findByIdAndUpdate(
       id,
@@ -139,24 +109,15 @@ const userDelete = async (req, res = response) => {
 
     return responseObjectBuilder(
       res,
-      200,
-      true,
+      httpStatus.OK,      
       `Success`,
-      "Object won't be deleted permanently, just disabled",
+      'Delete success',
+      "Objects aren't permanently erased from database, they're just disabled.",
       user
     );
   } catch (error) {
-
-    logger.error(`Error: ${error}`);
-    // new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error.message, error.errors);
-    return responseObjectBuilder(
-      res,
-      500,
-      true,
-      error.message,
-      error.name,
-      error.errors
-    );
+    logger.error(`Error: ${error}`);    
+    return responseObjectBuilder(res, httpStatus.INTERNAL_SERVER_ERROR, `Error`, `Delete failure`, error.message);
   }
 };
 

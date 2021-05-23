@@ -75,7 +75,7 @@ const UserSchema = Schema ({
 //must be used function due "this" have to be used for return data
 UserSchema.methods.toJSON = function(){
   //extract _v and password for response
-  const { __v, password, _id, ...userObject} = this.toObject();
+  const { __v, password, _id, token, ...userObject} = this.toObject();
 
   userObject.uuid= _id;
   //getting filtered object

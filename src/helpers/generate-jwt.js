@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
 import { jwt_config } from "../config/config.app.js";
-import {mongoose_config} from "../config/config.app.js";
 import logger from "../config/logger.js";
 
 const generateJWT = (uuid = "") => {

@@ -2,19 +2,20 @@ import { response } from "express";
 
 const responseObjectBuilder = (
   res = response,
-  code = 501,
-  isOk = false,
-  message = "Not defined",
-  moreInfo = "",
-  data = {}
+  code = 501,  
+  output = "Not defined",
+  message = "",  
+  details = "",
+  body = {}  
 ) => {
   return res.status(code).json({
-    ok: isOk,
-    message,
-    moreInfo,
-    body: {
-      data,
-    },
+    header: {
+      code,
+      output,
+      message,
+      details,
+    },    
+    body,
   });
 };
 

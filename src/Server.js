@@ -1,6 +1,7 @@
 import express from "express";
 import cors from 'cors';
 import helmet from "helmet";
+import httpStatus from "http-status"; 
 
 import logger from "./config/logger.js";
 import responseObjectBuilder from "./helpers/functions.helper.js";
@@ -18,8 +19,8 @@ class Server{
     docAPIPath= '';
 
     constructor() {
-        this.userAPIPath= '/api/user';
-        this.authAPIPath= '/api/auth';
+        this.userAPIPath= '/api/users';
+        this.authAPIPath= '/api/auths';
         this.docAPIPath= '/api-docs';
                 
         //config
@@ -44,7 +45,7 @@ class Server{
         }                     
         
         this.#app.use((req, res, next) => {
-            next(responseObjectBuilder(res, 501, true, 'Not Implemented', 'Method not implemented', null));
+            next(responseObjectBuilder(res, httpStatus.NOT_IMPLEMENTED, 'Fail', 'Not enabled', 'Resource you require is not implemented.'));
         });
     }
 
@@ -54,9 +55,9 @@ class Server{
         this.#app.use(cors());
 
         // set security HTTP headers
-        // this.#app.use(helmet());        
+        this.#app.use(helmet());        
         //TODO: add helmet CSP policy
-        this.#app.use(helmet({contentSecurityPolicy:false}));        
+        // this.#app.use(helmet({contentSecurityPolicy:false}));        
         // this.#app.use(helmet.contentSecurityPolicy({
         //     directives: {
         //      defaultSrc: ["'self'", "apis.google.com"],

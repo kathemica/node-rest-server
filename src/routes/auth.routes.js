@@ -3,29 +3,10 @@ import { check } from "express-validator";
 
 import fieldValidation from '../validations/fields.validation.js';
 import { isEmailUnique } from "../helpers/db-validators.js";
-import {authLogin, authGoogleLogin} from '../controllers/auth.controller.js';
+import {authLogin, authLogout, authGoogleLogin} from '../controllers/auth.controller.js';
+import auth from "../middlewares/auth.js";
 
 const router = Router();
-
-router
-    .route("/login")
-    .post( [
-        check('email', 'Invalid email').isEmail(),
-        check('email', 'Email doesn\'t exists').not().custom( isEmailUnique ),
-        check('password', 'Password must have a valid value').not().isEmpty(),    
-        fieldValidation
-    ],authLogin);
-
-router
-    .route("/googlelogin")
-    .post([    
-        check('id_token', 'id_token is required').not().isEmpty(),        
-        fieldValidation
-    ],authGoogleLogin);
-
-export {
-    router as authRouter
-}
 
 /**
  * @swagger
@@ -36,10 +17,12 @@ export {
 
 /**
  * @swagger
- * /api/auth/login:
+ * /api/auths/login:
  *   post:
+ *     tags: [Auth] 
  *     summary: Login
- *     tags: [Auth]
+ *     consumes:
+ *       - application/json 
  *     requestBody:
  *       required: true
  *       content:
@@ -61,23 +44,132 @@ export {
  *               password: password1
  *     responses:
  *       "200":
- *         description: OK
+ *         $ref: '#/components/responses/Success200'
+ *       "400 | 401":
+ *         description: When operaton got bad input data
  *         content:
  *           application/json:
  *             schema:
  *               type: object
- *               properties:
- *                 user:
- *                   $ref: '#/components/schemas/User'
- *                 token:
- *                   $ref: '#/components/schemas/AuthTokens'
- *       "401":
- *         description: Invalid email or password
+ *               properties:  
+ *                 header: 
+ *                   $ref: '#/components/schemas/ResponseHeader'
+ *                 body: 
+ *                   type: object
+ *               example:
+ *                 header:   
+ *                   code: ['400', '401']
+ *                   output: [Fail, Error]
+ *                   message: some message
+ *                   deails: some details 
+ *                 body: 
+ *                   null
+ */
+router
+    .route("/login")
+    .post( [
+        check('email', 'Invalid email').isEmail(),
+        check('email', 'Email doesn\'t exists').not().custom( isEmailUnique ),
+        check('password', 'Password must have a valid value').not().isEmpty(),    
+        fieldValidation
+    ],authLogin);
+
+//TODO: actualizar esta entrada
+/**
+ * @swagger
+ * /api/auths/logout:
+ *   post:
+ *     tags: [Auth] 
+ *     summary: logout
+ *     consumes:
+ *       - application/json 
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *                 format: password
+ *             example:
+ *               email: fake@example.com
+ *               password: password1
+ *     responses:
+ *       "200":
+ *         $ref: '#/components/responses/Success200'
+ *       "400 | 401":
+ *         description: When operaton got bad input data
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Error'
- *             example:
- *               code: 401
- *               message: Invalid email or password
+ *               type: object
+ *               properties:  
+ *                 header: 
+ *                   $ref: '#/components/schemas/ResponseHeader'
+ *                 body: 
+ *                   type: object
+ *               example:
+ *                 header:   
+ *                   code: ['400', '401']
+ *                   output: [Fail, Error]
+ *                   message: some message
+ *                   deails: some details 
+ *                 body: 
+ *                   null
  */
+router
+    .route("/logout")
+    .post( [
+        auth("ADMIN_ROLE", "USER_ROLE", "SALES_ROLE"),           
+        fieldValidation
+    ],authLogout);    
+
+
+/**
+ * @swagger
+ * /api/auths/googlelogin:
+ *   post:
+ *     tags: [Auth] 
+ *     summary: googlelogin
+ *     consumes:
+ *       - application/json 
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - id_token 
+ *             properties:
+ *               id_token:
+ *                 type: string
+ *             example:
+ *               id_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWJhYzUzNDk1NGI1NDEzOTgwNmMxMTIiLCJpYXQiOjE1ODkyOTg0ODQsImV4cCI6MTU4OTMwMDI4NH0.m1U63blB0MLej_WfB7yC2FTMnCziif9X8yzwDEfJXAg
+ *     responses:
+ *       "200":
+ *         $ref: '#/components/responses/Success200'
+ *       "400":
+ *         $ref: '#/components/responses/IDTokenRequired'
+ *       "401":
+ *         $ref: '#/components/responses/GoogleAuth401'       
+ */
+router
+    .route("/googlelogin")
+    .post([    
+        check('id_token', 'id_token is required').not().isEmpty(),        
+        fieldValidation
+    ],authGoogleLogin);
+
+export {
+    router as authRouter
+}
+

@@ -20,6 +20,103 @@ import {
 
 const router = Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: User
+ *   description: User handeling
+ */
+
+/**
+ * @swagger
+ * /api/users/:
+ *   get:
+ *     tags: [User] 
+ *     summary: /
+ *     description: Get all users, auth for ADMIN_ROLE, USER_ROLE
+ *     consumes:
+ *       - application/json 
+ *     parameters:
+ *       - in: header
+ *         name: x-auth-token
+ *         schema:
+ *           type: string
+ *           format: jwt
+ *         required: true
+ *     responses:
+ *       "200":
+ *          description: When operation is success
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  header: 
+ *                    $ref: '#/components/schemas/ResponseHeader'
+ *                  body:                   
+ *                    type: array
+ *                    items:
+ *                      $ref: '#/components/schemas/UserLight'
+ *       "400":
+ *         $ref: '#/components/responses/IDTokenRequired'
+ *       "500":
+ *         $ref: '#/components/schemas/Error'  
+ *   post:
+ *     tags: [User] 
+ *     summary: /
+ *     description: Create a user, auth for ADMIN_ROLE
+ *     consumes:
+ *       - application/json
+ *     parameters:
+ *       - in: header
+ *         name: x-auth-token
+ *         schema:
+ *           type: string
+ *           format: jwt
+ *         required: true      
+  *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - firstName
+ *               - lastName
+ *               - email
+ *               - password
+ *               - role
+ *               - isActive
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *                 format: password
+ *               role:
+ *                 type: string
+ *               isActive:
+ *                 type: boolean 
+ *             example:
+ *               firstName: Fulanito
+ *               lastName: Detal
+ *               email: fake@example.com
+ *               password: auausasdasdsasda
+ *               role:  [ADMIN_ROLE, USER_ROLE]           
+ *               isActive: [true, false]
+ *     responses:
+ *       "200":
+ *         $ref: '#/components/responses/Success200'
+ *       "400":
+ *         $ref: '#/components/responses/IDTokenRequired'
+ *       "500":
+ *         $ref: '#/components/schemas/Error'       
+ */
+
 router
   .route('/')
   .get([
@@ -37,6 +134,135 @@ router
     ],
     userPost
   );
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   get:
+ *     tags: [User] 
+ *     summary: /{id}
+ *     description: Get specific user by id, auth for ADMIN_ROLE, USER_ROLE
+ *     consumes:
+ *       - application/json 
+ *     parameters:
+ *       - in: header
+ *         name: x-auth-token
+ *         schema:
+ *           type: string
+ *           format: jwt
+ *         required: true
+ *       - in: path
+ *         name: id
+ *         description: The user ID
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         required: true 
+ *     responses:
+ *       "200":
+ *          description: When operation is success
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  header: 
+ *                    $ref: '#/components/schemas/ResponseHeader'
+ *                  body:
+ *                    $ref: '#/components/schemas/UserLight' 
+ *       "400":
+ *         $ref: '#/components/responses/IDTokenRequired'
+ *       "500":
+ *         $ref: '#/components/responses/Error'  
+ *   patch:
+ *     tags: [User] 
+ *     summary: /{id}
+ *     description: Create a user, auth for ADMIN_ROLE
+ *     consumes:
+ *       - application/json
+ *     parameters:
+ *       - in: header
+ *         name: x-auth-token
+ *         schema:
+ *           type: string
+ *           format: jwt
+ *         required: true    
+ *       - in: path
+ *         name: id
+ *         description: The user ID
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         required: true  
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - firstName
+ *               - lastName
+ *               - email
+ *               - password
+ *               - role
+ *               - isActive
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *                 format: password
+ *               role:
+ *                 type: string
+ *               isActive:
+ *                 type: boolean 
+ *             example:
+ *               firstName: Fulanito
+ *               lastName: Detal
+ *               email: fake@example.com
+ *               password: auausasdasdsasda
+ *               role:  [ADMIN_ROLE, USER_ROLE]           
+ *               isActive: [true, false]
+ *     responses:
+ *       "200":
+ *         $ref: '#/components/responses/Success'
+ *       "400":
+ *         $ref: '#/components/responses/IDTokenRequired'
+ *       "500":
+ *         $ref: '#/components/schemas/Error'
+ *   delete:
+ *     tags: [User] 
+ *     summary: /{id}
+ *     description: Delete a user, auth for ADMIN_ROLE
+ *     consumes:
+ *       - application/json
+ *     parameters:
+ *       - in: header
+ *         name: x-auth-token
+ *         schema:
+ *           type: string
+ *           format: jwt
+ *         required: true   
+ *       - in: path
+ *         name: id
+ *         description: The user ID
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         required: true
+ *     responses:
+ *       "200":
+ *         $ref: '#/components/responses/Success'
+ *       "400":
+ *         $ref: '#/components/responses/IDTokenRequired'
+ *       "500":
+ *         $ref: '#/components/schemas/Error'     
+ */
 
 router
   .route('/:id') 
@@ -74,13 +300,3 @@ router
   );
 
 export { router as userRouter };
-
-/**
- * @openapi
- * /:
- *   get:
- *     description: Welcome to swagger-jsdoc!
- *     responses:
- *       200:
- *         description: Returns a mysterious string.
- */

@@ -18,8 +18,9 @@ const auth = (...requiredRoles) => async (req, res, next) => {
         req.user = user;
 
         next();        
-    } catch (error) {        
-        return responseObjectBuilder(res, error.statusCode, true, error.message);
+    } catch (error) {
+        console.log("Auth error");
+        return responseObjectBuilder(res, error.statusCode, 'Error', `Auth fails`, error.message);
     }    
 }
 
