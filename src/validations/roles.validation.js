@@ -1,8 +1,8 @@
 // import { request, response } from "express";
-import _ from "lodash";
-import httpStatus from "http-status";
+import _ from 'lodash';
+import httpStatus from 'http-status';
 // import responseObjectBuilder from "../helpers/functions.helper.js";
-import ApiError from "../helpers/ApiError.js";
+import ApiError from '../helpers/ApiError.js';
 
 // const validateAdminRole = (req, res = response, next) => {
 //   if (!req.user) {
@@ -30,18 +30,18 @@ import ApiError from "../helpers/ApiError.js";
 // };
 
 const validateRoles = (user = null, requiredRoles = []) => {
-  try {        
+  try {
     if (_.isNil(user)) {
-      throw new ApiError(httpStatus.PRECONDITION_FAILED, `User can't be null`);      
+      throw new ApiError(httpStatus.PRECONDITION_FAILED, `User can't be null`);
     }
 
     if (!requiredRoles.includes(user.role)) {
-      throw new ApiError(httpStatus.UNAUTHORIZED, `User must have a valid role to perfom this action: ${requiredRoles}`);      
+      throw new ApiError(httpStatus.UNAUTHORIZED, `User must have a valid role to perfom this action: ${requiredRoles}`);
     }
 
-    return true;      
-  } catch (error) {    
-    throw new ApiError(error.statusCode, error.message);  
+    return true;
+  } catch (error) {
+    throw new ApiError(error.statusCode, error.message);
   }
 };
 

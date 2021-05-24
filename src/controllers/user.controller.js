@@ -1,13 +1,12 @@
-import { response } from "express";
-import bcryptjs from "bcryptjs";
-import _ from "lodash";
-import Users from "../models/User.model.js";
-import responseObjectBuilder from "../helpers/functions.helper.js";
-import httpStatus from "http-status";
-import ApiError from "../helpers/ApiError.js";
+import { response } from 'express';
+import bcryptjs from 'bcryptjs';
+import _ from 'lodash';
+import httpStatus from 'http-status';
+import Users from '../models/User.model.js';
+import responseObjectBuilder from '../helpers/functions.helper.js';
 import logger from '../config/logger.js';
 
-//get one uses
+// get one uses
 const userGetOne = async (req, res = response) => {
   try {
     const { id } = req.params;
@@ -21,21 +20,21 @@ const userGetOne = async (req, res = response) => {
   }
 };
 
-//get all users with pagination
+// get all users with pagination
 const userGet = async (req, res = response) => {
   try {
-    //object destructuration
+    // object destructuration
     const { limit = 5, from = 0 } = req.query;
 
     const query = { isActive: true };
 
-    //array destructuration
+    // array destructuration
     const [total, users] = await Promise.all([
       Users.countDocuments(query),
       Users.find(query).skip(Number(from)).limit(Number(limit)),
     ]);
 
-    return responseObjectBuilder(res, httpStatus.OK, `Success`, `Get all success`, "", {
+    return responseObjectBuilder(res, httpStatus.OK, `Success`, `Get all success`, '', {
       total,
       users,
     });
@@ -45,26 +44,26 @@ const userGet = async (req, res = response) => {
   }
 };
 
-//create a new user
+// create a new user
 const userPost = async (req, res = response) => {
   try {
     const { firstName, lastName, email, password, role } = req.body;
     const user = new Users({ firstName, lastName, email, password, role });
 
-    //encript pass
+    // encript pass
     const salt = bcryptjs.genSaltSync();
     user.password = bcryptjs.hashSync(password, salt);
 
     await user.save();
 
-    return responseObjectBuilder(res, httpStatus.OK, `Success`, `Create success`,  "", user);
+    return responseObjectBuilder(res, httpStatus.OK, `Success`, `Create success`, '', user);
   } catch (error) {
     logger.error(`Error: ${error}`);
     return responseObjectBuilder(res, httpStatus.INTERNAL_SERVER_ERROR, `Error`, `Create failure`, error.message);
   }
 };
 
-//update a user
+// update a user
 const userPatch = async (req, res = response) => {
   try {
     const { id } = req.params;
@@ -84,10 +83,8 @@ const userPatch = async (req, res = response) => {
       res,
       httpStatus.OK,
       `Success`,
-      `Update success`, 
-      !_.isUndefined(data.isGoogle)
-        ? "'Google tag' field is readonly, won't be changed"
-        : "",
+      `Update success`,
+      !_.isUndefined(data.isGoogle) ? "'Google tag' field is readonly, won't be changed" : '',
       user
     );
   } catch (error) {
@@ -96,27 +93,23 @@ const userPatch = async (req, res = response) => {
   }
 };
 
-//Delete a user
+// Delete a user
 const userDelete = async (req, res = response) => {
   try {
-    const { id } = req.params;    
+    const { id } = req.params;
 
-    const user = await Users.findByIdAndUpdate(
-      id,
-      { isActive: false },
-      { returnOriginal: false }
-    );
+    const user = await Users.findByIdAndUpdate(id, { isActive: false }, { returnOriginal: false });
 
     return responseObjectBuilder(
       res,
-      httpStatus.OK,      
+      httpStatus.OK,
       `Success`,
       'Delete success',
       "Objects aren't permanently erased from database, they're just disabled.",
       user
     );
   } catch (error) {
-    logger.error(`Error: ${error}`);    
+    logger.error(`Error: ${error}`);
     return responseObjectBuilder(res, httpStatus.INTERNAL_SERVER_ERROR, `Error`, `Delete failure`, error.message);
   }
 };

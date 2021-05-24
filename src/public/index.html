@@ -19,6 +19,7 @@
         console.log('Image URL: ' + profile.getImageUrl());
         console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
 
+        // eslint-disable-next-line camelcase
         var id_token = googleUser.getAuthResponse().id_token;
 
         fetch(url, {
@@ -27,9 +28,9 @@
             body: JSON.stringify({id_token})
         }).then( resp=> resp.json()
         ).then(data => console.log('Server:', data))
-        .catch(console.log)        
+        .catch(console.log)
     }
-  
+
     function signOut() {
           var auth2 = gapi.auth2.getAuthInstance();
           auth2.signOut().then(function () {

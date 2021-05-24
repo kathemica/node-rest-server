@@ -1,11 +1,10 @@
-import dotenv from "dotenv";
-import _ from "lodash";
+import dotenv from 'dotenv';
 import Joi from 'joi';
 
 dotenv.config();
 
 const envVarsSchema = Joi.object()
-  .keys({    
+  .keys({
     NODE_ENV: Joi.string().valid('production', 'development', 'test').required(),
     APP_PATH: Joi.string().default(process.env.INIT_CWD).description('Base app path'),
     PORT: Joi.number().default(8080),
@@ -32,7 +31,6 @@ const envVarsSchema = Joi.object()
     GOOGLE_CLIENT_ID: Joi.string().description('Cliend ID for google Auth API '),
     GOOGLE_SECRET_ID: Joi.string().description('The key for access Google API Service'),
     npm_package_version: Joi.string().default('').description('Version from package.json'),
-    
   })
   .unknown();
 
@@ -42,12 +40,12 @@ if (error) {
   throw new Error(`Config validation error: ${error.message}`);
 }
 
-const APP_PATH =envVars.APP_PATH;
-const VERSION =envVars.npm_package_version;
-const env= envVars.NODE_ENV;
-const PORT= envVars.PORT;
+const { APP_PATH } = envVars;
+const VERSION = envVars.npm_package_version;
+const env = envVars.NODE_ENV;
+const { PORT } = envVars;
 
-const mongoose_config= {
+const mongooseConfig = {
   url: envVars.MONGO_URL + (envVars.NODE_ENV === 'test' ? '-test' : ''),
   is_tls: envVars.IS_TLS,
   CA_CERT: envVars.CA_CERT,
@@ -60,11 +58,11 @@ const mongoose_config= {
     useCreateIndex: true,
     useFindAndModify: false,
     sslValidate: false,
-    tlsAllowInvalidHostnames: true
+    tlsAllowInvalidHostnames: true,
   },
 };
 
-const jwt_config= {
+const jwtConfig = {
   secret: envVars.JWT_SECRET,
   accessExpirationMinutes: envVars.JWT_ACCESS_EXPIRATION_MINUTES,
   refreshExpirationDays: envVars.JWT_REFRESH_EXPIRATION_DAYS,
@@ -72,12 +70,12 @@ const jwt_config= {
   verifyEmailExpirationMinutes: envVars.JWT_VERIFY_EMAIL_EXPIRATION_MINUTES,
 };
 
-const google_config= {
+const googleConfig = {
   GOOGLE_CLIENT_ID: envVars.GOOGLE_CLIENT_ID,
-  GOOGLE_SECRET_ID: envVars.GOOGLE_SECRET_ID
-}
+  GOOGLE_SECRET_ID: envVars.GOOGLE_SECRET_ID,
+};
 
-const email_config= {
+const emailConfig = {
   smtp: {
     host: envVars.SMTP_HOST,
     port: envVars.SMTP_PORT,
@@ -89,13 +87,4 @@ const email_config= {
   from: envVars.EMAIL_FROM,
 };
 
-export  {  
-  APP_PATH,
-  VERSION,
-  env,
-  PORT,
-  mongoose_config,
-  jwt_config,
-  email_config,
-  google_config
-};
+export { APP_PATH, VERSION, env, PORT, mongooseConfig, jwtConfig, emailConfig, googleConfig };

@@ -1,14 +1,13 @@
-import { response } from "express";
-import bcryptjs from "bcryptjs";
-import _ from "lodash";
-import httpStatus from "http-status";
+import { response } from 'express';
+import bcryptjs from 'bcryptjs';
+import httpStatus from 'http-status';
 
-import { generateJWT } from "../helpers/generate-jwt.js";
-import Users from "../models/User.model.js";
-import responseObjectBuilder from "../helpers/functions.helper.js";
-import googleVerify from "../helpers/google-verify.js";
-import ApiError from "../helpers/ApiError.js";
-import logger from "../config/logger.js";
+import generateJWT from '../helpers/generate-jwt.js';
+import Users from '../models/User.model.js';
+import responseObjectBuilder from '../helpers/functions.helper.js';
+import googleVerify from '../helpers/google-verify.js';
+import ApiError from '../helpers/ApiError.js';
+import logger from '../config/logger.js';
 
 /**
  * Login with username and password
@@ -16,106 +15,113 @@ import logger from "../config/logger.js";
  * @param {string} password
  * @returns {Promise<User>}
  */
-const authLogin = async (req, res = response) => {
+const login = async (req, res = response) => {
   try {
     const { email, password } = req.body;
 
-    let user = await Users.findOne({ email: email, isActive: true });
+    let user = await Users.findOne({ email, isActive: true });
 
     if (!user) {
-      throw new ApiError(httpStatus.UNAUTHORIZED, 'Account is disabled or doesn\'t exists');      
+      throw new ApiError(httpStatus.UNAUTHORIZED, "Account is disabled or doesn't exists");
     }
 
     const isValidPassword = bcryptjs.compareSync(password, user.password);
 
     if (!isValidPassword) {
-      throw new ApiError(httpStatus.UNAUTHORIZED, 'Password is invalid');      
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Password is invalid');
     }
 
-    user.token = await generateJWT(user.id);    
+    user.token = await generateJWT(user.id);
 
-    user = await Users.findByIdAndUpdate(user.id, {token: user.token}, {
-      returnOriginal: false,
-    });    
+    user = await Users.findByIdAndUpdate(
+      user.id,
+      { token: user.token },
+      {
+        returnOriginal: false,
+      }
+    );
 
-    return responseObjectBuilder(res, httpStatus.OK, "Success", `Login success`, "", {
+    return responseObjectBuilder(res, httpStatus.OK, 'Success', `Login success`, '', {
       user,
       token: user.token,
     });
-
   } catch (error) {
-    logger.error("Login failure");
+    logger.error('Login failure');
     return responseObjectBuilder(res, error.statusCode, `Error`, `Login failure`, error.message);
   }
 };
 
-//TODO: finalizar este método
-const authLogout = async (req, res = response) => {
+// TODO: finalizar este método
+const logout = async (req, res = response) => {
   try {
     const { email, password } = req.body;
 
-    let user = await Users.findOne({ email: email, isActive: true });
+    let user = await Users.findOne({ email, isActive: true });
 
     if (!user) {
-      throw new ApiError(httpStatus.UNAUTHORIZED, 'Account is disabled or doesn\'t exists');      
+      throw new ApiError(httpStatus.UNAUTHORIZED, "Account is disabled or doesn't exists");
     }
 
     const isValidPassword = bcryptjs.compareSync(password, user.password);
 
     if (!isValidPassword) {
-      throw new ApiError(httpStatus.UNAUTHORIZED, 'Password is invalid');      
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Password is invalid');
     }
 
-    user.token = await generateJWT(user.id);    
+    user.token = await generateJWT(user.id);
 
-    user = await Users.findByIdAndUpdate(user.id, {token: user.token}, {
-      returnOriginal: false,
-    });    
+    user = await Users.findByIdAndUpdate(
+      user.id,
+      { token: user.token },
+      {
+        returnOriginal: false,
+      }
+    );
 
-    return responseObjectBuilder(res, httpStatus.OK, "Success", `Logout success`, '', {
+    return responseObjectBuilder(res, httpStatus.OK, 'Success', `Logout success`, '', {
       user,
       token: user.token,
     });
-
-  } catch (error) {   
-    logger.error("Logout failure"); 
-    return responseObjectBuilder(res, error.statusCode, `Error`, `Logout failure`, error.message );
+  } catch (error) {
+    logger.error('Logout failure');
+    return responseObjectBuilder(res, error.statusCode, `Error`, `Logout failure`, error.message);
   }
 };
 
-const authGoogleLogin = async (req, res = response) => {
+const loginGoogle = async (req, res = response) => {
   try {
-    const { id_token } = req.body;    
+    // eslint-disable-next-line camelcase
+    const { id_token } = req.body;
 
-    const {firstName, lastName, email, image} = await googleVerify(id_token); 
+    const { firstName, lastName, email, image } = await googleVerify(id_token);
 
-    let user = await Users.findOne({email});
+    let user = await Users.findOne({ email });
 
-    if (!user){
-      const data={
-        firstName, 
+    if (!user) {
+      const data = {
+        firstName,
         lastName,
         email,
         password: '!"#$%&/()',
         image,
-        isGoogle: true
-      }
+        isGoogle: true,
+      };
 
       user = new Users(data);
       await user.save();
-    }; 
-    
-    if(!user.isActive){
-      throw new ApiError(httpStatus.UNAUTHORIZED, 'Account is disabled'); 
+    }
+
+    if (!user.isActive) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Account is disabled');
     }
 
     const token = await generateJWT(user.id);
 
-    return responseObjectBuilder(res, httpStatus.OK, "Success", "Google Auth success", '', {user, token});    
+    return responseObjectBuilder(res, httpStatus.OK, 'Success', 'Google Auth success', '', { user, token });
   } catch (error) {
-    logger.error("Google login failure");
-    return responseObjectBuilder(res, error.statusCode, `Error`, `Google auth failure`, error.message );
+    logger.error('Google login failure');
+    return responseObjectBuilder(res, error.statusCode, `Error`, `Google auth failure`, error.message);
   }
-}
+};
 
-export { authLogin, authGoogleLogin, authLogout };
+export { login, loginGoogle, logout };

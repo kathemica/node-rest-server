@@ -1,12 +1,12 @@
-import { response } from "express";
+import { response } from 'express';
 
 const responseObjectBuilder = (
   res = response,
-  code = 501,  
-  output = "Not defined",
-  message = "",  
-  details = "",
-  body = {}  
+  code = 501,
+  output = 'Not defined',
+  message = '',
+  details = '',
+  body = {}
 ) => {
   return res.status(code).json({
     header: {
@@ -14,7 +14,7 @@ const responseObjectBuilder = (
       output,
       message,
       details,
-    },    
+    },
     body,
   });
 };

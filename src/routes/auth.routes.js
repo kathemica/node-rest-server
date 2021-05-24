@@ -1,10 +1,10 @@
-import { Router } from "express";
-import { check } from "express-validator";
+import { Router } from 'express';
+import { check } from 'express-validator';
 
 import fieldValidation from '../validations/fields.validation.js';
-import { isEmailUnique } from "../helpers/db-validators.js";
-import {authLogin, authLogout, authGoogleLogin} from '../controllers/auth.controller.js';
-import auth from "../middlewares/auth.js";
+import { isEmailUnique } from '../helpers/db-validators.js';
+import { login, logout, loginGoogle } from '../controllers/auth.controller.js';
+import auth from '../middlewares/auth.js';
 
 const router = Router();
 
@@ -19,10 +19,10 @@ const router = Router();
  * @swagger
  * /api/auths/login:
  *   post:
- *     tags: [Auth] 
+ *     tags: [Auth]
  *     summary: Login
  *     consumes:
- *       - application/json 
+ *       - application/json
  *     requestBody:
  *       required: true
  *       content:
@@ -51,38 +51,41 @@ const router = Router();
  *           application/json:
  *             schema:
  *               type: object
- *               properties:  
- *                 header: 
+ *               properties:
+ *                 header:
  *                   $ref: '#/components/schemas/ResponseHeader'
- *                 body: 
+ *                 body:
  *                   type: object
  *               example:
- *                 header:   
+ *                 header:
  *                   code: ['400', '401']
  *                   output: [Fail, Error]
  *                   message: some message
- *                   deails: some details 
- *                 body: 
+ *                   deails: some details
+ *                 body:
  *                   null
  */
 router
-    .route("/login")
-    .post( [
-        check('email', 'Invalid email').isEmail(),
-        check('email', 'Email doesn\'t exists').not().custom( isEmailUnique ),
-        check('password', 'Password must have a valid value').not().isEmpty(),    
-        fieldValidation
-    ],authLogin);
+  .route('/login')
+  .post(
+    [
+      check('email', 'Invalid email').isEmail(),
+      check('email', "Email doesn't exists").not().custom(isEmailUnique),
+      check('password', 'Password must have a valid value').not().isEmpty(),
+      fieldValidation,
+    ],
+    login
+  );
 
-//TODO: actualizar esta entrada
+// TODO: actualizar esta entrada
 /**
  * @swagger
  * /api/auths/logout:
  *   post:
- *     tags: [Auth] 
+ *     tags: [Auth]
  *     summary: logout
  *     consumes:
- *       - application/json 
+ *       - application/json
  *     requestBody:
  *       required: true
  *       content:
@@ -111,36 +114,30 @@ router
  *           application/json:
  *             schema:
  *               type: object
- *               properties:  
- *                 header: 
+ *               properties:
+ *                 header:
  *                   $ref: '#/components/schemas/ResponseHeader'
- *                 body: 
+ *                 body:
  *                   type: object
  *               example:
- *                 header:   
+ *                 header:
  *                   code: ['400', '401']
  *                   output: [Fail, Error]
  *                   message: some message
- *                   deails: some details 
- *                 body: 
+ *                   deails: some details
+ *                 body:
  *                   null
  */
-router
-    .route("/logout")
-    .post( [
-        auth("ADMIN_ROLE", "USER_ROLE", "SALES_ROLE"),           
-        fieldValidation
-    ],authLogout);    
-
+router.route('/logout').post([auth('ADMIN_ROLE', 'USER_ROLE', 'SALES_ROLE'), fieldValidation], logout);
 
 /**
  * @swagger
  * /api/auths/googlelogin:
  *   post:
- *     tags: [Auth] 
+ *     tags: [Auth]
  *     summary: googlelogin
  *     consumes:
- *       - application/json 
+ *       - application/json
  *     requestBody:
  *       required: true
  *       content:
@@ -148,7 +145,7 @@ router
  *           schema:
  *             type: object
  *             required:
- *               - id_token 
+ *               - id_token
  *             properties:
  *               id_token:
  *                 type: string
@@ -160,16 +157,9 @@ router
  *       "400":
  *         $ref: '#/components/responses/IDTokenRequired'
  *       "401":
- *         $ref: '#/components/responses/GoogleAuth401'       
+ *         $ref: '#/components/responses/GoogleAuth401'
  */
-router
-    .route("/googlelogin")
-    .post([    
-        check('id_token', 'id_token is required').not().isEmpty(),        
-        fieldValidation
-    ],authGoogleLogin);
+router.route('/googlelogin').post([check('id_token', 'id_token is required').not().isEmpty(), fieldValidation], loginGoogle);
 
-export {
-    router as authRouter
-}
-
+// eslint-disable-next-line import/prefer-default-export
+export { router as authRouter };

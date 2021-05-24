@@ -1,5 +1,5 @@
 import winston from 'winston';
-import {env} from './config.app.js';
+import { env } from './config.app.js';
 
 const enumerateErrorFormat = winston.format((info) => {
   if (info instanceof Error) {

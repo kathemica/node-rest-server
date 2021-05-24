@@ -6,7 +6,15 @@
   "scripts": {
     "dev": "set NODE_ENV=development&&nodemon ./src/app",
     "dev-prod": "set NODE_ENV=production&&nodemon ./src/app",
-    "start": "node ./src/app"
+    "start": "node ./src/app",
+    "test": "jest -i --colors --verbose --detectOpenHandles",
+    "test:watch": "jest -i --watchAll",
+    "coverage": "jest -i --coverage",
+    "coverage:coveralls": "jest -i --coverage --coverageReporters=text-lcov | coveralls",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prettier": "prettier --check **/*.js",
+    "prettier:fix": "prettier --write **/*.js"
   },
   "repository": {
     "type": "git",
@@ -31,7 +39,6 @@
     "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
-    "colors": "^1.4.0",
     "cors": "^2.8.5",
     "dotenv": "^9.0.1",
     "express": "^4.17.1",
@@ -50,6 +57,17 @@
     "winston": "^3.3.3"
   },
   "devDependencies": {
+    "@babel/core": "^7.14.3",
+    "@babel/eslint-parser": "^7.14.3",
+    "eslint": "^7.27.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.23.3",
+    "eslint-plugin-jest": "^24.3.6",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-security": "^1.4.0",
+    "jest": "^26.6.3",
     "nodemon": "^2.0.7"
-  }
+  },
+  "eslintIgnore": ["docs.route.js"]
 }

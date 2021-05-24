@@ -1,39 +1,48 @@
-import swaggerJsDoc from "swagger-jsdoc";
-import swaggerUi from"swagger-ui-express"; 
-import { Router } from "express";
-import { swaggerDefinition } from "../doc/swaggerDef.js";
-import { APP_PATH } from "../config/config.app.js";
+import swaggerJsDoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { Router } from 'express';
+import { swaggerDefinition } from '../doc/swaggerDef.js';
+import { APP_PATH } from '../config/config.app.js';
+import logger from '../config/logger.js';
 
 const router = Router();
 
-const specs = await swaggerJsDoc({
-    swaggerDefinition,
-    apis: [
-        APP_PATH + '/src/routes/*.js',                 
-        APP_PATH + '/src/doc/*.yml', 
-    ],    
-    components:{
+const docs = async () => {
+  try {
+    const jsDocContent = {
+      swaggerDefinition,
+      apis: [`${APP_PATH}/src/routes/*.js`, `${APP_PATH}/src/doc/*.yml`],
+      components: {
         securitySchemes: {
-            jwt: {
-                type: 'http',
-                scheme: 'bearer',
-                in: 'header',
-                bearerFormat: 'JWT'    
-            }
+          jwt: {
+            type: 'http',
+            scheme: 'bearer',
+            in: 'header',
+            bearerFormat: 'JWT',
+          },
         },
-        security: [{
-            jwt: []
-        }]
-    }
-  });
+        security: [
+          {
+            jwt: [],
+          },
+        ],
+      },
+    };
 
-router.use('/', swaggerUi.serve);
-
-router.get('/', swaggerUi.setup(specs, {
+    const specs = await swaggerJsDoc(jsDocContent);
+    router.use('/', swaggerUi.serve);
+    router.get(
+      '/',
+      swaggerUi.setup(specs, {
         explorer: true,
-    })
-);
+      })
+    );
+  } catch (error) {
+    logger.error('Error on config swagger');
+  }
+};
 
-export {
-    router as docsRouter
-}  
+docs();
+
+// eslint-disable-next-line import/prefer-default-export
+export { router as docsRouter };

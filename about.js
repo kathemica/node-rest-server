@@ -1,5 +1,5 @@
-import colors from 'colors';
+import logger from './src/config/logger.js';
 
-console.log('Node web app'.blue);
-console.log(`${'By:'.green} ${'Eng. Katherine Aguirre'.white}`);
-console.log(`${'Contact:'.green} ${'https://www.linkedin.com/in/kathesama/'.white}`);
+logger.info('Node web app'.blue);
+logger.info(`By: Eng. Katherine Aguirre`);
+logger.info(`Contact: https://www.linkedin.com/in/kathesama/`);
