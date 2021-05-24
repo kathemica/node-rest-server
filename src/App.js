@@ -12,6 +12,8 @@ class App {
 
   #port = null;
 
+  #server = null;
+
   userPath = '';
 
   authPath = '';
@@ -91,9 +93,21 @@ class App {
   }
 
   start() {
-    this.#app.listen(this.#port, () => {
+    this.#server = this.#app.listen(this.#port, () => {
       logger.info(`App is running at port: ${this.#port}`);
     });
+  }
+
+  close(){
+    if (this.#server){
+        this.#server.close(() => {
+          logger.info('Server closed');
+          process.exit(1);
+        }
+      )
+    }else {
+        process.exit(1);
+    }
   }
 }
 

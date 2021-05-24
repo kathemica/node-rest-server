@@ -7,10 +7,7 @@ app.start();
 
 const exitHandler = () => {
   if (app) {
-    app.close(() => {
-      logger.info('Server closed');
-      process.exit(1);
-    });
+    app.close();
   }
 };
 
