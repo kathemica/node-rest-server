@@ -7,8 +7,7 @@ const envVarsSchema = Joi.object()
   .keys({
     NODE_ENV: Joi.string()
       .default(process.env.NODE_ENV || 'development')
-      .valid('production', 'development', 'test')
-      .required(),
+      .valid('production', 'development', 'test'),
     APP_PATH: Joi.string()
       .default(process.env.INIT_CWD || '')
       .description('Base app path'),
