@@ -2,8 +2,8 @@
 import mongoose from 'mongoose';
 import fs from 'fs';
 
-import logger from '../config/logger.js';
-import { mongooseConfig } from '../config/config.app.js';
+import { logger } from './logger.js';
+import { mongooseConfig } from './app.config.js';
 
 const dbConnection = async () => {
   try {
@@ -30,4 +30,5 @@ const dbConnection = async () => {
   }
 };
 
-export default dbConnection;
+// eslint-disable-next-line import/prefer-default-export
+export { dbConnection };

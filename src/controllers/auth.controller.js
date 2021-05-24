@@ -2,12 +2,9 @@ import { response } from 'express';
 import bcryptjs from 'bcryptjs';
 import httpStatus from 'http-status';
 
-import generateJWT from '../helpers/generate-jwt.js';
-import Users from '../models/User.model.js';
-import responseObjectBuilder from '../helpers/functions.helper.js';
-import googleVerify from '../helpers/google-verify.js';
-import ApiError from '../helpers/ApiError.js';
-import logger from '../config/logger.js';
+import { Users } from '../models/index.js';
+import { logger } from '../config/index.js';
+import { generateJWT, responseObjectBuilder, googleVerify, ApiError } from '../utils/index.js';
 
 /**
  * Login with username and password

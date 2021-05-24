@@ -1,7 +1,8 @@
 import httpStatus from 'http-status';
-import ApiError from '../helpers/ApiError.js';
-import Users from '../models/User.model.js';
-import validateRoles from './roles.validation.js';
+
+import { validateRoles } from './roles.validation.js';
+import { ApiError } from '../utils/index.js';
+import { Users } from '../models/index.js';
 
 const validateUser = async (uuid = '', requiredRoles = '') => {
   try {
@@ -23,4 +24,6 @@ const validateUser = async (uuid = '', requiredRoles = '') => {
   }
 };
 
-export default validateUser;
+// eslint-disable-next-line import/prefer-default-export
+export { validateUser };
+// export default validateUser;

@@ -1,6 +1,5 @@
 import { OAuth2Client } from 'google-auth-library';
-import logger from '../config/logger.js';
-import { googleConfig } from '../config/config.app.js';
+import { logger, googleConfig } from '../config/index.js';
 
 const client = new OAuth2Client(googleConfig.GOOGLE_CLIENT_ID);
 
@@ -25,4 +24,5 @@ const googleVerify = async (idToken = '') => {
   }
 };
 
-export default googleVerify;
+// eslint-disable-next-line import/prefer-default-export
+export { googleVerify };

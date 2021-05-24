@@ -2,9 +2,10 @@ import { response } from 'express';
 import bcryptjs from 'bcryptjs';
 import _ from 'lodash';
 import httpStatus from 'http-status';
-import Users from '../models/User.model.js';
-import responseObjectBuilder from '../helpers/functions.helper.js';
-import logger from '../config/logger.js';
+
+import { responseObjectBuilder } from '../utils/index.js';
+import { Users } from '../models/index.js';
+import { logger } from '../config/index.js';
 
 // get one uses
 const userGetOne = async (req, res = response) => {

@@ -1,5 +1,5 @@
 import winston from 'winston';
-import { env } from './config.app.js';
+import { env } from './app.config.js';
 
 const enumerateErrorFormat = winston.format((info) => {
   if (info instanceof Error) {
@@ -23,4 +23,5 @@ const logger = winston.createLogger({
   ],
 });
 
-export default logger;
+// eslint-disable-next-line import/prefer-default-export
+export { logger };

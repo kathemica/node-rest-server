@@ -9,4 +9,7 @@ const RoleSchema = Schema({
   },
 });
 
-export default model('Roles', RoleSchema);
+const Roles = model('Roles', RoleSchema);
+
+// eslint-disable-next-line import/prefer-default-export
+export { Roles };

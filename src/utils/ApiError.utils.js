@@ -13,4 +13,5 @@ class ApiError extends Error {
   }
 }
 
-export default ApiError;
+// eslint-disable-next-line import/prefer-default-export
+export { ApiError };

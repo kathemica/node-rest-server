@@ -1,7 +1,8 @@
 import httpStatus from 'http-status';
 import jwt from 'jsonwebtoken';
-import ApiError from '../helpers/ApiError.js';
-import { jwtConfig } from '../config/config.app.js';
+
+import { ApiError } from '../utils/index.js';
+import { jwtConfig } from '../config/index.js';
 
 const validateJWT = async (token = '') => {
   try {
@@ -22,4 +23,5 @@ const validateJWT = async (token = '') => {
   }
 };
 
-export default validateJWT;
+// eslint-disable-next-line import/prefer-default-export
+export { validateJWT };

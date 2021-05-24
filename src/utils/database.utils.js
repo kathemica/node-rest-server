@@ -1,5 +1,4 @@
-import Roles from '../models/Roles.model.js';
-import Users from '../models/User.model.js';
+import { Roles, Users } from '../models/index.js';
 
 // check rol
 const isValidRol = async (role = '') => {
@@ -37,4 +36,5 @@ const weakPassword = async (password = '') => {
   return password;
 };
 
+// eslint-disable-next-line import/prefer-default-export
 export { isValidRol, isEmailUnique, existsID, weakPassword };

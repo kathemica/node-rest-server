@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { jwtConfig } from '../config/config.app.js';
-import logger from '../config/logger.js';
+import { jwtConfig, logger } from '../config/index.js';
 
 const generateJWT = (uuid = '') => {
   return new Promise((resolve, reject) => {
@@ -18,5 +17,8 @@ const generateJWT = (uuid = '') => {
   });
 };
 
-export default generateJWT;
+// eslint-disable-next-line import/prefer-default-export
+export { generateJWT };
+
+
 // TODO: se debe sumar tiempo de sesión a cada usuario cuando el token lo está usando

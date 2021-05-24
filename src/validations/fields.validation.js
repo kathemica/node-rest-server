@@ -1,6 +1,7 @@
 import { validationResult } from 'express-validator';
 import httpStatus from 'http-status';
-import responseObjectBuilder from '../helpers/functions.helper.js';
+
+import { responseObjectBuilder } from '../utils/index.js';
 
 const fieldValidation = (req, res, next) => {
   const error = validationResult(req);
@@ -38,4 +39,5 @@ const fieldValidation = (req, res, next) => {
   next();
 };
 
-export default fieldValidation;
+// eslint-disable-next-line import/prefer-default-export
+export { fieldValidation };

@@ -1,4 +1,4 @@
-import { VERSION, PORT } from '../config/config.app.js';
+import { VERSION, PORT } from '../config/index.js';
 
 const swaggerDef = {
   openapi: '3.0.0',

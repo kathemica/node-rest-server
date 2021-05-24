@@ -1,33 +1,7 @@
-// import { request, response } from "express";
 import _ from 'lodash';
 import httpStatus from 'http-status';
-// import responseObjectBuilder from "../helpers/functions.helper.js";
-import ApiError from '../helpers/ApiError.js';
 
-// const validateAdminRole = (req, res = response, next) => {
-//   if (!req.user) {
-//     return responseObjectBuilder(
-//       res,
-//       500,
-//       true,
-//       "Failure",
-//       "Token must be validate first"
-//     );
-//   }
-
-//   if (!_.isEqual(req.user.role, "ADMIN_ROLE")) {
-//     return responseObjectBuilder(
-//       res,
-//       401,
-//       true,
-//       "Failure",
-//       "User is not Admin",
-//       null
-//     );
-//   }
-
-//   next();
-// };
+import { ApiError } from '../utils/index.js';
 
 const validateRoles = (user = null, requiredRoles = []) => {
   try {
@@ -45,4 +19,7 @@ const validateRoles = (user = null, requiredRoles = []) => {
   }
 };
 
-export default validateRoles;
+
+// eslint-disable-next-line import/prefer-default-export
+export { validateRoles };
+// export default validateRoles;

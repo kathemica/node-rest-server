@@ -1,10 +1,9 @@
 import _ from 'lodash';
 import httpStatus from 'http-status';
-import validateJWT from '../validations/jwt.validation.js';
-import validateUser from '../validations/user.validation.js';
-import responseObjectBuilder from '../helpers/functions.helper.js';
-import ApiError from '../helpers/ApiError.js';
-import logger from '../config/logger.js';
+
+import { logger } from '../config/index.js';
+import { ApiError, responseObjectBuilder } from '../utils/index.js';
+import { validateJWT, validateUser } from '../validations/index.js';
 
 const auth =
   (...requiredRoles) =>
@@ -31,4 +30,6 @@ const auth =
     }
   };
 
-export default auth;
+// eslint-disable-next-line import/prefer-default-export
+export { auth };
+// export default auth;

@@ -19,4 +19,5 @@ const responseObjectBuilder = (
   });
 };
 
-export default responseObjectBuilder;
+// eslint-disable-next-line import/prefer-default-export
+export { responseObjectBuilder };

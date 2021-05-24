@@ -9,4 +9,7 @@ const SettingsSchema = Schema({
   },
 });
 
-export default model('Settings', SettingsSchema);
+const Settings = model('Settings', SettingsSchema);
+
+// eslint-disable-next-line import/prefer-default-export
+export { Settings };

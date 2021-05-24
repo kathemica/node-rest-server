@@ -1,9 +1,9 @@
 import swaggerJsDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { Router } from 'express';
+
 import { swaggerDefinition } from '../doc/swaggerDef.js';
-import { APP_PATH } from '../config/config.app.js';
-import logger from '../config/logger.js';
+import { APP_PATH, logger } from '../config/index.js';
 
 const router = Router();
 

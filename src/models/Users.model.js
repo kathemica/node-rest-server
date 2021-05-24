@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-
 import validator from 'validator';
 
 const { Schema, model } = mongoose;
@@ -85,4 +84,7 @@ UserSchema.methods.toJSON = function () {
   return userObject;
 };
 
-export default model('Users', UserSchema);
+const Users = model('Users', UserSchema);
+
+// eslint-disable-next-line import/prefer-default-export
+export { Users };

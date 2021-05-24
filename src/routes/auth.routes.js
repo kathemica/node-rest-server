@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { check } from 'express-validator';
 
-import fieldValidation from '../validations/fields.validation.js';
-import { isEmailUnique } from '../helpers/db-validators.js';
-import { login, logout, loginGoogle } from '../controllers/auth.controller.js';
-import auth from '../middlewares/auth.js';
+import { isEmailUnique } from '../utils/index.js';
+import { auth } from '../middlewares/index.js';
+import { fieldValidation } from '../validations/index.js';
+import { login, logout, loginGoogle } from '../controllers/index.js';
 
 const router = Router();
 

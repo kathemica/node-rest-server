@@ -1,11 +1,10 @@
 import { Router } from 'express';
 import { check } from 'express-validator';
-import auth from '../middlewares/auth.js';
-import fieldValidation from '../validations/fields.validation.js';
 
-import { isValidRol, isEmailUnique, existsID, weakPassword } from '../helpers/db-validators.js';
-
-import { userGet, userGetOne, userPost, userPatch, userDelete } from '../controllers/user.controller.js';
+import { auth } from '../middlewares/index.js';
+import { fieldValidation } from '../validations/index.js';
+import { isValidRol, isEmailUnique, existsID, weakPassword } from '../utils/index.js';
+import { userGet, userGetOne, userPost, userPatch, userDelete } from '../controllers/index.js';
 
 const router = Router();
 
