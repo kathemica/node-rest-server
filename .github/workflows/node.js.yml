@@ -9,6 +9,12 @@ on:
 jobs:
   first-job:
     name: Build with Node
+    env:
+      NODE_ENV: ${{ secrets.NODE_ENV }}
+      INIT_CWD: ${{ secrets.INIT_CWD }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      MONGO_URL: ${{ secrets.MONGO_URL }}
+      PORT: ${{ secrets.PORT }}
     runs-on: ubuntu-latest
     container: node:15.11.0
     steps:
