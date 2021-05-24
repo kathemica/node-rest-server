@@ -5,13 +5,20 @@ dotenv.config();
 
 const envVarsSchema = Joi.object()
   .keys({
-    NODE_ENV: Joi.string().valid('production', 'development', 'test').required(),
+    NODE_ENV: Joi.string()
+      .default(process.env.NODE_ENV || 'development')
+      .valid('production', 'development', 'test')
+      .required(),
     APP_PATH: Joi.string()
       .default(process.env.INIT_CWD || '')
       .description('Base app path'),
     PORT: Joi.number().default(8080),
-    MONGO_URL: Joi.string().required().description('Mongo DB url'),
-    JWT_SECRET: Joi.string().required().description('JWT secret key'),
+    MONGO_URL: Joi.string()
+      .default(process.env.MONGO_URL || '')
+      .description('Mongo DB url'),
+    JWT_SECRET: Joi.string()
+      .default(process.env.JWT_SECRET || '')
+      .description('JWT secret key'),
     JWT_ACCESS_EXPIRATION_MINUTES: Joi.string().default('30m').description('minutes after which access tokens expire'),
     JWT_REFRESH_EXPIRATION_DAYS: Joi.string().default('d').description('days after which refresh tokens expire'),
     JWT_RESET_PASSWORD_EXPIRATION_MINUTES: Joi.string()
