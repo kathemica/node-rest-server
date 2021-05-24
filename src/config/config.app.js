@@ -11,8 +11,7 @@ const envVarsSchema = Joi.object()
       .required(true),
     APP_PATH: Joi.string()
       .default(process.env.INIT_CWD || '')
-      .description('Base app path')
-      .required(true),
+      .description('Base app path'),
     PORT: Joi.number().default(8080),
     MONGO_URL: Joi.string()
       .default(process.env.MONGO_URL || '')
