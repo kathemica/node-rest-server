@@ -15,6 +15,7 @@ jobs:
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       MONGO_URL: ${{ secrets.MONGO_URL }}
       PORT: ${{ secrets.PORT }}
+      APP_PATH: ${{ secrets.APP_PATH }}
     runs-on: ubuntu-latest
     container: node:15.11.0
     steps:
