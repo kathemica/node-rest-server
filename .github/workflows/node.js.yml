@@ -5,7 +5,7 @@ name: Node Web Server
 
 on:
   push:
-    branches: [ main ]  
+    branches: [ main ]
 jobs:
   first-job:
     name: Build with Node
@@ -17,8 +17,8 @@ jobs:
       - name: Checking NPM version
         run: npm --version
       - name: Checking out code
-        uses: actions/checkout@main  
+        uses: actions/checkout@main
       - name: Installing NPM dependencies
         run: npm install
       - name: Running about
-        run: node about.js 
+        run: npm run about

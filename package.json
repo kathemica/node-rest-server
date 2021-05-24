@@ -4,6 +4,7 @@
   "description": "Node REST server",
   "main": "src/app.js",
   "scripts": {
+    "about": "set NODE_ENV=production&&node about",
     "dev": "set NODE_ENV=development&&nodemon ./src/app",
     "dev-prod": "set NODE_ENV=production&&nodemon ./src/app",
     "start": "node ./src/app",
