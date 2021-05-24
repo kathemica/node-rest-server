@@ -6,7 +6,9 @@ dotenv.config();
 const envVarsSchema = Joi.object()
   .keys({
     NODE_ENV: Joi.string().valid('production', 'development', 'test').required(),
-    APP_PATH: Joi.string().default(process.env.INIT_CWD).description('Base app path'),
+    APP_PATH: Joi.string()
+      .default(process.env.INIT_CWD || '')
+      .description('Base app path'),
     PORT: Joi.number().default(8080),
     MONGO_URL: Joi.string().required().description('Mongo DB url'),
     JWT_SECRET: Joi.string().required().description('JWT secret key'),
@@ -87,4 +89,5 @@ const emailConfig = {
   from: envVars.EMAIL_FROM,
 };
 
-export { APP_PATH, VERSION, env, PORT, mongooseConfig, jwtConfig, emailConfig, googleConfig };
+export default emailConfig;
+export { APP_PATH, VERSION, env, PORT, mongooseConfig, jwtConfig, googleConfig };
