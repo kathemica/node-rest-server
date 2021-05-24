@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { check } from 'express-validator';
 
-import { auth } from '../middlewares/index.js';
+import { authorize } from '../middlewares/index.js';
 import { fieldValidation } from '../validations/index.js';
 import { isValidRol, isEmailUnique, existsID, weakPassword } from '../utils/index.js';
 import { userGet, userGetOne, userPost, userPatch, userDelete } from '../controllers/index.js';
@@ -21,12 +21,12 @@ const router = Router();
  *   get:
  *     tags: [User]
  *     summary: /
- *     description: Get all users, auth for ADMIN_ROLE, USER_ROLE
+ *     description: Get all users, authorize for ADMIN_ROLE, USER_ROLE
  *     consumes:
  *       - application/json
  *     parameters:
  *       - in: header
- *         name: x-auth-token
+ *         name: x-authorize-token
  *         schema:
  *           type: string
  *           format: jwt
@@ -52,12 +52,12 @@ const router = Router();
  *   post:
  *     tags: [User]
  *     summary: /
- *     description: Create a user, auth for ADMIN_ROLE
+ *     description: Create a user, authorize for ADMIN_ROLE
  *     consumes:
  *       - application/json
  *     parameters:
  *       - in: header
- *         name: x-auth-token
+ *         name: x-authorize-token
  *         schema:
  *           type: string
  *           format: jwt
@@ -107,10 +107,10 @@ const router = Router();
 
 router
   .route('/')
-  .get([auth('ADMIN_ROLE', 'USER_ROLE', 'SALES_ROLE')], userGet)
+  .get([authorize('ADMIN_ROLE', 'USER_ROLE', 'SALES_ROLE')], userGet)
   .post(
     [
-      auth('ADMIN_ROLE'),
+      authorize('ADMIN_ROLE'),
       check('firstName', 'First name is required').not().isEmpty(),
       check('lastName', 'Last name is required').not().isEmpty(),
       check('email', 'Invalid email').isEmail(),
@@ -128,12 +128,12 @@ router
  *   get:
  *     tags: [User]
  *     summary: /{id}
- *     description: Get specific user by id, auth for ADMIN_ROLE, USER_ROLE
+ *     description: Get specific user by id, authorize for ADMIN_ROLE, USER_ROLE
  *     consumes:
  *       - application/json
  *     parameters:
  *       - in: header
- *         name: x-auth-token
+ *         name: x-authorize-token
  *         schema:
  *           type: string
  *           format: jwt
@@ -164,12 +164,12 @@ router
  *   patch:
  *     tags: [User]
  *     summary: /{id}
- *     description: Create a user, auth for ADMIN_ROLE
+ *     description: Create a user, authorize for ADMIN_ROLE
  *     consumes:
  *       - application/json
  *     parameters:
  *       - in: header
- *         name: x-auth-token
+ *         name: x-authorize-token
  *         schema:
  *           type: string
  *           format: jwt
@@ -225,12 +225,12 @@ router
  *   delete:
  *     tags: [User]
  *     summary: /{id}
- *     description: Delete a user, auth for ADMIN_ROLE
+ *     description: Delete a user, authorize for ADMIN_ROLE
  *     consumes:
  *       - application/json
  *     parameters:
  *       - in: header
- *         name: x-auth-token
+ *         name: x-authorize-token
  *         schema:
  *           type: string
  *           format: jwt
@@ -255,7 +255,7 @@ router
   .route('/:id')
   .get(
     [
-      auth('ADMIN_ROLE', 'USER_ROLE', 'SALES_ROLE'),
+      authorize('ADMIN_ROLE', 'USER_ROLE', 'SALES_ROLE'),
       check('id', 'Id is not valid').isMongoId(),
       check('id').custom(existsID),
       fieldValidation,
@@ -264,7 +264,7 @@ router
   )
   .patch(
     [
-      auth('ADMIN_ROLE'),
+      authorize('ADMIN_ROLE'),
       check('id', 'Id is not valid').isMongoId(),
       check('id').custom(existsID),
       check('email', 'Invalid email').optional().isEmail(),
@@ -277,7 +277,7 @@ router
   )
   .delete(
     [
-      auth('ADMIN_ROLE'),
+      authorize('ADMIN_ROLE'),
       check('id', 'Id is empty').not().isEmpty(),
       check('id', 'Id is not valid').isMongoId(),
       check('id').custom(existsID),

@@ -7,7 +7,7 @@ import { responseObjectBuilder } from './utils/index.js';
 import { PORT, env, dbConnection, logger } from './config/index.js';
 import { userRouter , authRouter, docsRouter } from './routes/index.js';
 
-class Server {
+class App {
   #app = null;
 
   #port = null;
@@ -36,7 +36,7 @@ class Server {
   }
 
   #routes() {
-    // adding routes to server
+    // adding routes to App
     this.#app.use(this.authAPIPath, authRouter);
     this.#app.use(this.userAPIPath, userRouter);
 
@@ -59,7 +59,7 @@ class Server {
 
   #middlewares() {
     // middlewares
-    // CORS: enable petition when using several services at same server
+    // CORS: enable petition when using several services at same App
     this.#app.use(cors());
 
     // set security HTTP headers
@@ -92,14 +92,14 @@ class Server {
 
   start() {
     this.#app.listen(this.#port, () => {
-      logger.info(`Server is running at port: ${this.#port}`);
+      logger.info(`App is running at port: ${this.#port}`);
     });
   }
 
   stop() {
     if (this.#app) {
       this.#app.close(() => {
-        logger.info('Server closed');
+        logger.info('App closed');
         process.exit(1);
       });
     } else {
@@ -108,4 +108,4 @@ class Server {
   }
 }
 
-export default Server;
+export default App;

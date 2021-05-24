@@ -5,7 +5,7 @@ import { logger } from '../config/index.js';
 import { ApiError, responseObjectBuilder } from '../utils/index.js';
 import { validateJWT, validateUser } from '../validations/index.js';
 
-const auth =
+const authorize =
   (...requiredRoles) =>
   async (req, res, next) => {
     try {
@@ -31,5 +31,5 @@ const auth =
   };
 
 // eslint-disable-next-line import/prefer-default-export
-export { auth };
+export { authorize };
 // export default auth;

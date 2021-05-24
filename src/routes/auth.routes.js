@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { check } from 'express-validator';
 
 import { isEmailUnique } from '../utils/index.js';
-import { auth } from '../middlewares/index.js';
+import { authorize } from '../middlewares/index.js';
 import { fieldValidation } from '../validations/index.js';
 import { login, logout, loginGoogle } from '../controllers/index.js';
 
@@ -11,15 +11,15 @@ const router = Router();
 /**
  * @swagger
  * tags:
- *   name: Auth
- *   description: Authentication
+ *   name: authorize
+ *   description: authorizeentication
  */
 
 /**
  * @swagger
- * /api/auths/login:
+ * /api/authorizes/login:
  *   post:
- *     tags: [Auth]
+ *     tags: [authorize]
  *     summary: Login
  *     consumes:
  *       - application/json
@@ -80,9 +80,9 @@ router
 // TODO: actualizar esta entrada
 /**
  * @swagger
- * /api/auths/logout:
+ * /api/authorizes/logout:
  *   post:
- *     tags: [Auth]
+ *     tags: [authorize]
  *     summary: logout
  *     consumes:
  *       - application/json
@@ -128,13 +128,13 @@ router
  *                 body:
  *                   null
  */
-router.route('/logout').post([auth('ADMIN_ROLE', 'USER_ROLE', 'SALES_ROLE'), fieldValidation], logout);
+router.route('/logout').post([authorize('ADMIN_ROLE', 'USER_ROLE', 'SALES_ROLE'), fieldValidation], logout);
 
 /**
  * @swagger
- * /api/auths/googlelogin:
+ * /api/authorizes/googlelogin:
  *   post:
- *     tags: [Auth]
+ *     tags: [authorize]
  *     summary: googlelogin
  *     consumes:
  *       - application/json
@@ -157,7 +157,7 @@ router.route('/logout').post([auth('ADMIN_ROLE', 'USER_ROLE', 'SALES_ROLE'), fie
  *       "400":
  *         $ref: '#/components/responses/IDTokenRequired'
  *       "401":
- *         $ref: '#/components/responses/GoogleAuth401'
+ *         $ref: '#/components/responses/Googleauthorize401'
  */
 router.route('/googlelogin').post([check('id_token', 'id_token is required').not().isEmpty(), fieldValidation], loginGoogle);
 

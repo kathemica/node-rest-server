@@ -2,7 +2,7 @@
   "name": "node-rest-server",
   "version": "1.0.0",
   "description": "Node REST server",
-  "main": "src/index.js",
+  "main": "./src/index.js",
   "scripts": {
     "about": "set NODE_ENV=development&&node about",
     "dev": "set NODE_ENV=development&&nodemon ./src/index",
