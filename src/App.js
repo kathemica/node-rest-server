@@ -95,17 +95,6 @@ class App {
       logger.info(`App is running at port: ${this.#port}`);
     });
   }
-
-  stop() {
-    if (this.#app) {
-      this.#app.close(() => {
-        logger.info('App closed');
-        process.exit(1);
-      });
-    } else {
-      process.exit(1);
-    }
-  }
 }
 
 export default App;

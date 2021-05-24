@@ -7,7 +7,10 @@ app.start();
 
 const exitHandler = () => {
   if (app) {
-    app.stop();
+    app.close(() => {
+      logger.info('Server closed');
+      process.exit(1);
+    });
   }
 };
 
@@ -22,4 +25,7 @@ process.on('unhandledRejection', unexpectedErrorHandler);
 process.on('SIGTERM', () => {
   logger.info('SIGTERM received');
   exitHandler();
+  if (app) {
+    app.close();
+  }
 });
