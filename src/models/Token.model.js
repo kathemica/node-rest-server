@@ -15,7 +15,6 @@ const tokenSchema = mongoose.Schema(
       type: String,
       required: true,
       index: true,
-      unique: true,
     },
     user: {
       type: mongoose.SchemaTypes.ObjectId,
