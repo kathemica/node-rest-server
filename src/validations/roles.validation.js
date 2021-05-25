@@ -19,7 +19,6 @@ const validateRoles = (user = null, requiredRoles = []) => {
   }
 };
 
-
 // eslint-disable-next-line import/prefer-default-export
 export { validateRoles };
 // export default validateRoles;

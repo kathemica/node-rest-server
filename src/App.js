@@ -2,10 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import httpStatus from 'http-status';
+import Fingerprint from 'express-fingerprint';
 
 import { responseObjectBuilder } from './utils/index.js';
 import { PORT, env, dbConnection, logger } from './config/index.js';
-import { userRouter , authRouter, docsRouter } from './routes/index.js';
+import { userRouter, authRouter, docsRouter } from './routes/index.js';
 
 class App {
   #app = null;
@@ -13,6 +14,8 @@ class App {
   #port = null;
 
   #server = null;
+
+  #connection = null;
 
   userPath = '';
 
@@ -35,6 +38,14 @@ class App {
     this.#middlewares();
 
     this.#routes();
+  }
+
+  #connectDB() {
+    try {
+      this.#connection = dbConnection();
+    } catch (error) {
+      logger.error(`Error loading db, details:${error}`);
+    }
   }
 
   #routes() {
@@ -67,6 +78,30 @@ class App {
     // set security HTTP headers
     this.#app.use(helmet());
 
+    // remembering browser
+    this.#app.use(
+      Fingerprint({
+        parameters: [
+          // Defaults
+          Fingerprint.useragent,
+          Fingerprint.acceptHeaders,
+          // Fingerprint.geoip,
+
+          // // Additional parameters
+          // function (next) {
+          //   next(null, {
+          //     param1: 'value1',
+          //   });
+          // },
+          // function (next) {
+          //   next(null, {
+          //     param2: 'value2',
+          //   });
+          // },
+        ],
+      })
+    );
+
     // parsing body
     this.#app.use(express.json());
     this.#app.use(
@@ -83,30 +118,20 @@ class App {
     );
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  #connectDB() {
-    try {
-      dbConnection();
-    } catch (error) {
-      logger.error(`Error loading db, details:${error}`);
-    }
-  }
-
   start() {
     this.#server = this.#app.listen(this.#port, () => {
       logger.info(`App is running at port: ${this.#port}`);
     });
   }
 
-  close(){
-    if (this.#server){
-        this.#server.close(() => {
-          logger.info('Server closed');
-          process.exit(1);
-        }
-      )
-    }else {
+  close() {
+    if (this.#server) {
+      this.#server.close(() => {
+        logger.info('Server closed');
         process.exit(1);
+      });
+    } else {
+      process.exit(1);
     }
   }
 }

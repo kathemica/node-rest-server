@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import validator from 'validator';
+import { toJSON } from './plugins/toJSON.plugin.js';
 
 const { Schema, model } = mongoose;
 
@@ -66,18 +67,16 @@ const UserSchema = Schema({
     default: false,
     immutable: true,
   },
-  token: {
-    type: String,
-    trim: true,
-    default: null,
-  },
 });
+
+// add plugin that converts mongoose to json
+UserSchema.plugin(toJSON);
 
 // adjustment for response object
 // must be used function due "this" have to be used for return data
 UserSchema.methods.toJSON = function () {
   // extract _v and password for response
-  const { __v, password, _id, token, ...userObject } = this.toObject();
+  const { __v, password, _id, ...userObject } = this.toObject();
 
   userObject.uuid = _id;
   // getting filtered object

@@ -17,12 +17,19 @@ const router = Router();
 
 /**
  * @swagger
- * /api/authorizes/login:
+ * /api/auths/login:
  *   post:
  *     tags: [authorize]
  *     summary: Login
  *     consumes:
  *       - application/json
+ *     parameters:
+ *       - in: header
+ *         name: Accept-Language
+ *         schema:
+ *           type: string
+ *           example: [es, en]
+ *         required: true
  *     requestBody:
  *       required: true
  *       content:
@@ -65,27 +72,33 @@ const router = Router();
  *                 body:
  *                   null
  */
-router
-  .route('/login')
-  .post(
-    [
-      check('email', 'Invalid email').isEmail(),
-      check('email', "Email doesn't exists").not().custom(isEmailUnique),
-      check('password', 'Password must have a valid value').not().isEmpty(),
-      fieldValidation,
-    ],
-    login
-  );
+router.post(
+  '/login',
+  [
+    check('email', 'Invalid email').isEmail(),
+    check('email', "Email doesn't exists").not().custom(isEmailUnique),
+    check('password', 'Password must have a valid value').not().isEmpty(),
+    fieldValidation,
+  ],
+  login
+);
 
 // TODO: actualizar esta entrada
 /**
  * @swagger
- * /api/authorizes/logout:
+ * /api/auths/logout:
  *   post:
  *     tags: [authorize]
  *     summary: logout
  *     consumes:
  *       - application/json
+ *     parameters:
+ *       - in: header
+ *         name: Accept-Language
+ *         schema:
+ *           type: string
+ *           example: [es, en]
+ *         required: true
  *     requestBody:
  *       required: true
  *       content:
@@ -132,12 +145,19 @@ router.route('/logout').post([authorize('ADMIN_ROLE', 'USER_ROLE', 'SALES_ROLE')
 
 /**
  * @swagger
- * /api/authorizes/googlelogin:
+ * /api/auths/googlelogin:
  *   post:
  *     tags: [authorize]
  *     summary: googlelogin
  *     consumes:
  *       - application/json
+ *     parameters:
+ *       - in: header
+ *         name: Accept-Language
+ *         schema:
+ *           type: string
+ *           example: [es, en]
+ *         required: true
  *     requestBody:
  *       required: true
  *       content:

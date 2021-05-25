@@ -31,6 +31,12 @@ const router = Router();
  *           type: string
  *           format: jwt
  *         required: true
+ *       - in: header
+ *         name: Accept-Language
+ *         schema:
+ *           type: string
+ *           example: [es, en]
+ *         required: true
  *     responses:
  *       "200":
  *          description: When operation is success
@@ -61,6 +67,12 @@ const router = Router();
  *         schema:
  *           type: string
  *           format: jwt
+ *         required: true
+ *       - in: header
+ *         name: Accept-Language
+ *         schema:
+ *           type: string
+ *           example: [es, en]
  *         required: true
  *     requestBody:
  *       required: true
@@ -138,6 +150,12 @@ router
  *           type: string
  *           format: jwt
  *         required: true
+ *       - in: header
+ *         name: Accept-Language
+ *         schema:
+ *           type: string
+ *           example: [es, en]
+ *         required: true
  *       - in: path
  *         name: id
  *         description: The user ID
@@ -173,6 +191,12 @@ router
  *         schema:
  *           type: string
  *           format: jwt
+ *         required: true
+ *       - in: header
+ *         name: Accept-Language
+ *         schema:
+ *           type: string
+ *           example: [es, en]
  *         required: true
  *       - in: path
  *         name: id
@@ -234,6 +258,12 @@ router
  *         schema:
  *           type: string
  *           format: jwt
+ *         required: true
+ *       - in: header
+ *         name: Accept-Language
+ *         schema:
+ *           type: string
+ *           example: [es, en]
  *         required: true
  *       - in: path
  *         name: id

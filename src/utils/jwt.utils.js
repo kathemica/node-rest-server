@@ -20,5 +20,4 @@ const generateJWT = (uuid = '') => {
 // eslint-disable-next-line import/prefer-default-export
 export { generateJWT };
 
-
 // TODO: se debe sumar tiempo de sesión a cada usuario cuando el token lo está usando

@@ -5,7 +5,7 @@
     "es6": true
   },
   "extends": ["airbnb-base", "plugin:jest/recommended", "plugin:security/recommended", "plugin:prettier/recommended"],
-  "plugins": ["jest", "security", "prettier", "@babel/plugin-proposal-class-properties"],
+  "plugins": ["jest", "security", "prettier"],
   "parser": "@babel/eslint-parser",
 
   "parserOptions": {

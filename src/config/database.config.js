@@ -7,10 +7,10 @@ import { mongooseConfig } from './app.config.js';
 
 const dbConnection = async () => {
   try {
-    const sslCA = mongooseConfig.is_tls === true ? [fs.readFileSync(mongooseConfig.CA_CERT)] : '';
+    const sslCA = mongooseConfig.is_tls === true ? [fs.readFileSync(mongooseConfig.CA_CERT, 'utf-8')] : '';
     const sslPass = mongooseConfig.is_tls === true ? mongooseConfig.CA_TOKEN : '';
-    const sslKey = mongooseConfig.is_tls === true ? fs.readFileSync(mongooseConfig.KEY_CERT) : '';
-    const sslCert = mongooseConfig.is_tls === true ? fs.readFileSync(mongooseConfig.PEM_CERT) : '';
+    const sslKey = mongooseConfig.is_tls === true ? fs.readFileSync(mongooseConfig.KEY_CERT, 'utf-8') : '';
+    const sslCert = mongooseConfig.is_tls === true ? fs.readFileSync(mongooseConfig.PEM_CERT, 'utf-8') : '';
 
     const options = {
       sslCA,

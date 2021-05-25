@@ -4,7 +4,8 @@ import httpStatus from 'http-status';
 
 import { Users } from '../models/index.js';
 import { logger } from '../config/index.js';
-import { generateJWT, responseObjectBuilder, googleVerify, ApiError } from '../utils/index.js';
+import { responseObjectBuilder, googleVerify, ApiError } from '../utils/index.js';
+import { generateJWT, getRefreshToken } from '../services/token.service.js';
 
 /**
  * Login with username and password
@@ -16,7 +17,7 @@ const login = async (req, res = response) => {
   try {
     const { email, password } = req.body;
 
-    let user = await Users.findOne({ email, isActive: true });
+    const user = await Users.findOne({ email, isActive: true });
 
     if (!user) {
       throw new ApiError(httpStatus.UNAUTHORIZED, "Account is disabled or doesn't exists");
@@ -28,19 +29,20 @@ const login = async (req, res = response) => {
       throw new ApiError(httpStatus.UNAUTHORIZED, 'Password is invalid');
     }
 
-    user.token = await generateJWT(user.id);
+    // TODO: se deben enviar los tokens de acceso y refresh generados, el refresh se almacena
+    // y se valida su fingerprint para que corresponda con el refresh
+    // logger.info('login');
+    const tokenTupla = await getRefreshToken(user, req.fingerprint.hash);
 
-    user = await Users.findByIdAndUpdate(
-      user.id,
-      { token: user.token },
-      {
-        returnOriginal: false,
-      }
-    );
-
+    // user = await Users.findByIdAndUpdate(
+    //   user.id,
+    //   { tokens: tokenTupla, fingerprint: req.fingerprint.hash },
+    //   { returnOriginal: false }
+    // );
+    res.setHeader('Autorization', `Bearer ${tokenTupla.access.token}`);
     return responseObjectBuilder(res, httpStatus.OK, 'Success', `Login success`, '', {
       user,
-      token: user.token,
+      tokens: tokenTupla,
     });
   } catch (error) {
     logger.error('Login failure');
