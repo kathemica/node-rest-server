@@ -5,7 +5,7 @@
   "main": "./src/index.js",
   "scripts": {
     "about": "set NODE_ENV=development&&node about",
-    "dev": "set NODE_ENV=development&&nodemon ./src/index",
+    "dev": "set NODE_ENV=development&&nodemon ./src/index DEBUG=mquery",
     "dev-prod": "set NODE_ENV=production&&nodemon ./src/index",
     "start": "node ./src/index",
     "lint": "eslint .",

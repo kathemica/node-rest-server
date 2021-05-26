@@ -4,7 +4,7 @@ import { check } from 'express-validator';
 import { isEmailUnique } from '../utils/index.js';
 import { authorize } from '../middlewares/index.js';
 import { fieldValidation } from '../validations/index.js';
-import { login, logout, loginGoogle } from '../controllers/index.js';
+import { login, logout, loginGoogle, reAuthenticate } from '../controllers/index.js';
 
 const router = Router();
 
@@ -38,17 +38,12 @@ const router = Router();
  *             type: object
  *             required:
  *               - email
- *               - password
  *             properties:
  *               email:
  *                 type: string
  *                 format: email
- *               password:
- *                 type: string
- *                 format: password
  *             example:
  *               email: fake@example.com
- *               password: password1
  *     responses:
  *       "200":
  *         $ref: '#/components/responses/Success200'
@@ -99,6 +94,12 @@ router.post(
  *           type: string
  *           example: [es, en]
  *         required: true
+ *       - in: header
+ *         name: Authorization
+ *         schema:
+ *           type: string
+ *           example: Bearer token
+ *         required: true
  *     requestBody:
  *       required: true
  *       content:
@@ -141,7 +142,8 @@ router.post(
  *                 body:
  *                   null
  */
-router.route('/logout').post([authorize('ADMIN_ROLE', 'USER_ROLE', 'SALES_ROLE'), fieldValidation], logout);
+router.route('/logout').post([authorize('ADMIN_ROLE', 'USER_ROLE'), fieldValidation], logout);
+router.route('/reauthenticate').post([authorize('ADMIN_ROLE', 'USER_ROLE'), fieldValidation], reAuthenticate);
 
 /**
  * @swagger

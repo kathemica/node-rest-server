@@ -26,4 +26,3 @@ const validateUser = async (uuid = '', requiredRoles = '') => {
 
 // eslint-disable-next-line import/prefer-default-export
 export { validateUser };
-// export default validateUser;

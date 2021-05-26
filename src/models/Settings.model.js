@@ -3,9 +3,9 @@ import mongoose from 'mongoose';
 const { Schema, model } = mongoose;
 
 const SettingsSchema = Schema({
-  languaje: {
+  language: {
     type: String,
-    required: [true, 'Languaje is mandatory'],
+    required: [true, 'Language is mandatory'],
   },
 });
 

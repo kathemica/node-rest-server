@@ -45,12 +45,10 @@ const saveToken = async (token, userId, fingerprint, expires, type = '', blackli
 const verifyToken = async (token = '', type = tokenTypes, fingerprint = '') => {
   try {
     const payload = jwt.verify(token, jwtConfig.secret);
+    const query = { token, type, user: payload.sub, blacklisted: false, fingerprint };
 
-    const tokenDoc = await Token.findOne({ token, type, user: payload.sub, blacklisted: false, fingerprint });
-
-    if (!tokenDoc) {
-      throw new Error('Token not found');
-    }
+    const tokenDoc = await Token.findOne(query);
+    if (!tokenDoc) throw new ApiError(httpStatus.UNAUTHORIZED, `Token not found`);
 
     return tokenDoc;
   } catch (err) {
@@ -78,6 +76,24 @@ const getAccessToken = (uuid, expires, type, secret = jwtConfig.secret) => {
   return jwt.sign(payload, secret);
 };
 
+/**
+ * Delete auth tokens
+ * @param {Object} query with user, type and fingerprint (optional)
+ * @returns {Promise<Object>}
+ */
+const deleteUserTokens = async (query = {}) => {
+  try {
+    await Token.deleteMany(query, (err) => {
+      if (err) {
+        logger.error(err);
+        throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, err);
+      }
+    });
+  } catch (error) {
+    throw new ApiError(error.statusCode, error.message);
+  }
+};
+
 //------------------------------------------------------------
 /**
  * Generate auth tokens
@@ -102,44 +118,37 @@ const getRefreshToken = async (user, fingerprint) => {
   // RT
   // We validate that it does not have more than 5 RTs in total, else we delete them to create a new one
   if (RTTotalGeneral >= 5) {
-    await Token.deleteMany(queries.RTTotalGeneral, (err) => {
-      if (err) logger.error(err);
+    await deleteUserTokens(queries.RTTotalGeneral).then(
       logger.info(
         `User: ${user.id} was trying to create more than 5 refresh tokens, therefore all of those were erades and created a new one`
-      );
-    });
+      )
+    );
   }
 
   if (RTTotalWithSameFingerprint > 0) {
-    await Token.deleteMany(queries.RTTotalWithSameFingerprint, (err) => {
-      if (err) logger.error(err);
+    await deleteUserTokens(queries.RTTotalWithSameFingerprint).then(
       logger.info(
         `User: ${user.id} was trying to create more than 1 refresh tokens for the same device, therefore all of those were erades and created a new one`
-      );
-    });
+      )
+    );
   }
 
   if (ATTotalWithSameFingerprint > 0) {
-    await Token.deleteMany(queries.ATTotalWithSameFingerprint, (err) => {
-      if (err) logger.error(err);
+    await deleteUserTokens(queries.ATTotalWithSameFingerprint).then(
       logger.info(
         `User: ${user.id} was trying to create more than 1 access tokens for the same device, therefore all of those were erades and created a new one`
-      );
-    });
+      )
+    );
   }
 
   // AT
   // We validate that it do not have more than one AT per fingerprint
   const accessTokenExpires = moment().add(jwtConfig.accessExpirationMinutes, 'minutes');
-
   const accessToken = getAccessToken(user.id, accessTokenExpires, tokenTypes.ACCESS);
-
   await saveToken(accessToken, user.id, fingerprint, accessTokenExpires, tokenTypes.ACCESS);
 
   const refreshTokenExpires = moment().add(jwtConfig.refreshExpirationDays, 'days');
-
   const refreshToken = getAccessToken(user.id, refreshTokenExpires, tokenTypes.REFRESH);
-
   await saveToken(refreshToken, user.id, fingerprint, refreshTokenExpires, tokenTypes.REFRESH);
 
   return {
@@ -265,7 +274,8 @@ export {
   getAccessToken,
   getRefreshToken,
   verifyToken,
-  // saveToken,
+  deleteUserTokens,
+  saveToken,
   // verifyToken,
   // getRefreshToken,
   // generateResetPasswordToken,
