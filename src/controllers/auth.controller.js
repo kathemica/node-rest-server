@@ -2,6 +2,7 @@ import { request, response } from 'express';
 import bcryptjs from 'bcryptjs';
 import httpStatus from 'http-status';
 import moment from 'moment';
+import cryptoRandomString from 'crypto-random-string';
 
 import { Users } from '../models/index.js';
 import { jwtConfig, logger, tokenTypes } from '../config/index.js';
@@ -16,33 +17,6 @@ import {
   generateVerifyEmailToken,
 } from '../services/token.service.js';
 import { sendVerificationEmail } from '../services/email.service.js';
-
-// create user without email account activation
-const signup = async (req, res = response) => {
-  try {
-    const { firstName, lastName, email, password, role } = req.body;
-    const user = new Users({ firstName, lastName, email, password, role });
-
-    // encript pass
-    const salt = bcryptjs.genSaltSync();
-    user.password = bcryptjs.hashSync(password, salt);
-
-    await user.save();
-    // const data = {
-    //   to: email,
-    //   subject: 'account created',
-    //   text: 'testing content',
-    // };
-
-    const confirmToken = await generateVerifyEmailToken(user, req.fingerprint.hash);
-    await sendVerificationEmail(email, confirmToken);
-
-    return responseObjectBuilder(res, httpStatus.OK, `Success`, `Create success`, '', user);
-  } catch (error) {
-    logger.error('signup failure');
-    return responseObjectBuilder(res, error.statusCode, `Error`, `Signup failure`, error.message);
-  }
-};
 
 /**
  * Login with username and password
@@ -66,7 +40,7 @@ const login = async (req, res = response) => {
       throw new ApiError(httpStatus.UNAUTHORIZED, 'Password is invalid');
     }
 
-    // TODO: se deben enviar los tokens de acceso y refresh generados, el refresh se almacena
+    // Se deben enviar los tokens de acceso y refresh generados, el refresh se almacena
     // y se valida su fingerprint para que corresponda con el refresh
     const tokenTupla = await getRefreshToken(user, req.fingerprint.hash);
 
@@ -163,7 +137,7 @@ const loginGoogle = async (req, res = response) => {
         firstName,
         lastName,
         email,
-        password: '!"#$%&/()',
+        password: cryptoRandomString({ length: 10, type: 'ascii-printable' }),
         image,
         isGoogle: true,
       };
@@ -185,4 +159,62 @@ const loginGoogle = async (req, res = response) => {
   }
 };
 
-export { signup, login, loginGoogle, logout, reAuthenticate };
+// create user and then send an email account activation
+const signup = async (req, res = response) => {
+  try {
+    const { firstName, lastName, email, password, role } = req.body;
+    const user = new Users({ firstName, lastName, email, password, role });
+
+    // encript pass
+    const salt = bcryptjs.genSaltSync();
+    user.password = bcryptjs.hashSync(password, salt);
+
+    await user.save();
+
+    const confirmToken = await generateVerifyEmailToken(user, req.fingerprint.hash);
+    await sendVerificationEmail(email, confirmToken);
+
+    return responseObjectBuilder(res, httpStatus.OK, `Success`, `Create success`, '', user);
+  } catch (error) {
+    logger.error('signup failure');
+    return responseObjectBuilder(res, error.statusCode, `Error`, `Signup failure`, error.message);
+  }
+};
+
+// verify email account activation
+const verifyEmail = async (req, res = response) => {
+  try {
+    const { token } = req.params;
+
+    const tokenDoc = await verifyToken(token, tokenTypes.VERIFY_EMAIL);
+
+    const user = await Users.findByIdAndUpdate(tokenDoc.user, { isActive: true }, { returnOriginal: false });
+
+    return responseObjectBuilder(res, httpStatus.OK, 'Success', 'verifyEmail', user);
+  } catch (error) {
+    logger.error('verifyEmail failure');
+    return responseObjectBuilder(res, error.statusCode, `Error`, `Verifying email failure: `, error.message);
+  }
+};
+
+// get link for reset password
+const forgotPassword = async (req, res = response) => {
+  try {
+    return responseObjectBuilder(res, httpStatus.NOT_IMPLEMENTED, 'Success', 'function not implmented yet');
+  } catch (error) {
+    logger.error('verifyEmail failure');
+    return responseObjectBuilder(res, error.statusCode, `Error`, `Forgot password failure: `, error.message);
+  }
+};
+
+// execute password change action
+const resetPassword = async (req, res = response) => {
+  try {
+    return responseObjectBuilder(res, httpStatus.NOT_IMPLEMENTED, 'Success', 'function not implmented yet');
+  } catch (error) {
+    logger.error('verifyEmail failure');
+    return responseObjectBuilder(res, error.statusCode, `Error`, `Reset password failure: `, error.message);
+  }
+};
+
+export { signup, login, loginGoogle, logout, reAuthenticate, verifyEmail, forgotPassword, resetPassword };

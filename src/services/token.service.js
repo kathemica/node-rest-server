@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import moment from 'moment-timezone';
 import httpStatus from 'http-status';
 
-import { ApiError } from '../utils/index.js';
+import { ApiError } from '../utils/ApiError.utils.js';
 import { jwtConfig, logger, tokenTypes } from '../config/index.js';
 import { Token } from '../models/index.js';
 // import { tokenTypes } from '../config/tokens.enum.js';
@@ -45,7 +45,11 @@ const saveToken = async (token, userId, fingerprint, expires, type = '', blackli
 const verifyToken = async (token = '', type = tokenTypes, fingerprint = '') => {
   try {
     const payload = jwt.verify(token, jwtConfig.secret);
-    const query = { token, type, user: payload.sub, blacklisted: false, fingerprint };
+
+    // eslint-disable-next-line prefer-const
+    let query = { token, type, user: payload.sub, blacklisted: false };
+
+    if (fingerprint.length > 0) query.fingerprint = fingerprint;
 
     const tokenDoc = await Token.findOne(query);
     if (!tokenDoc) throw new ApiError(httpStatus.UNAUTHORIZED, `Token not found`);

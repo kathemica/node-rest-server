@@ -12,9 +12,10 @@ const envVarsSchema = Joi.object()
     APP_PATH: Joi.string()
       .default(process.env.INIT_CWD || '')
       .description('Base app path'),
-    SERVER_URL: Joi.string()
-      .default(process.env.SERVER_URL || 'http://localhost')
-      .description('Base app path'),
+    SERVER_FINGERKEY: Joi.string()
+      .default(process.env.INIT_CWD || '')
+      .description('Server Random Key '),
+    SERVER_URL: Joi.string().default(process.env.SERVER_URL).description('Base app path'),
     PORT: Joi.number().default(8080),
     MONGO_URL: Joi.string()
       .default(process.env.MONGO_URL || '')
@@ -57,6 +58,7 @@ const { APP_PATH } = envVars;
 const VERSION = envVars.npm_package_version;
 const env = envVars.NODE_ENV;
 const { PORT } = envVars;
+const { SERVER_FINGERKEY } = envVars;
 const SERVER_URL = `${envVars.SERVER_URL}:${PORT}`;
 
 const emailConfig = {
@@ -97,4 +99,4 @@ const googleConfig = {
 };
 
 // eslint-disable-next-line import/prefer-default-export
-export { emailConfig, APP_PATH, VERSION, env, PORT, SERVER_URL, mongooseConfig, jwtConfig, googleConfig };
+export { emailConfig, SERVER_FINGERKEY, APP_PATH, VERSION, env, PORT, SERVER_URL, mongooseConfig, jwtConfig, googleConfig };

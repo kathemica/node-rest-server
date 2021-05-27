@@ -1,4 +1,8 @@
+import { tokenTypes } from '../config/tokens.enum.js';
 import { Roles, Users } from '../models/index.js';
+
+// eslint-disable-next-line import/no-cycle
+import { verifyToken } from '../services/token.service.js';
 
 // check rol
 const isValidRol = async (role = '') => {
@@ -36,5 +40,16 @@ const weakPassword = async (password = '') => {
   return password;
 };
 
+// check valid token
+const isValidToken = async (token = '') => {
+  const payload = await verifyToken(token, tokenTypes.VERIFY_EMAIL);
+
+  if (!payload) {
+    throw new Error(`Token doesn't exists in db`);
+  }
+
+  return true;
+};
+
 // eslint-disable-next-line import/prefer-default-export
-export { isValidRol, isEmailUnique, existsID, weakPassword };
+export { isValidRol, isEmailUnique, existsID, weakPassword, isValidToken };

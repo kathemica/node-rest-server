@@ -5,7 +5,7 @@ import httpStatus from 'http-status';
 import Fingerprint from 'express-fingerprint';
 
 import { responseObjectBuilder } from './utils/index.js';
-import { PORT, env, dbConnection, logger } from './config/index.js';
+import { PORT, env, dbConnection, logger, SERVER_URL, SERVER_FINGERKEY } from './config/index.js';
 import { userRouter, authRouter, docsRouter } from './routes/index.js';
 
 class App {
@@ -87,12 +87,12 @@ class App {
           Fingerprint.acceptHeaders,
           // Fingerprint.geoip,
 
-          // // Additional parameters
-          // function (next) {
-          //   next(null, {
-          //     param1: 'value1',
-          //   });
-          // },
+          // Additional parameters
+          function (next) {
+            next(null, {
+              param1: SERVER_FINGERKEY,
+            });
+          },
           // function (next) {
           //   next(null, {
           //     param2: 'value2',
@@ -120,7 +120,7 @@ class App {
 
   start() {
     this.#server = this.#app.listen(this.#port, () => {
-      logger.info(`App is running at port: ${this.#port}`);
+      logger.info(`App is running at: ${SERVER_URL}`);
     });
   }
 

@@ -60,7 +60,7 @@ const UserSchema = Schema({
   },
   isActive: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   isGoogle: {
     type: Boolean,

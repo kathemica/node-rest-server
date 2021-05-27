@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { check } from 'express-validator';
 
-import { isEmailUnique, weakPassword, isValidRol, existsID } from '../utils/index.js';
+import { isEmailUnique, weakPassword, isValidRol, isValidToken } from '../utils/index.js';
 import { authorize } from '../middlewares/index.js';
 import { fieldValidation } from '../validations/index.js';
-import { signup, login, logout, loginGoogle, reAuthenticate } from '../controllers/index.js';
+import { signup, login, logout, loginGoogle, reAuthenticate, verifyEmail } from '../controllers/index.js';
 import { tokenTypes } from '../config/tokens.enum.js';
 
 const router = Router();
@@ -94,11 +94,31 @@ router.route('/singup').post(
   signup
 );
 
-router.route('/verify-email/:token').post(
-  //  create user
-  [check('id', 'Id is not valid').isMongoId(), check('id').custom(existsID), fieldValidation],
-  signup
+router.route('/verify-email/:token').get(
+  //  create user - verify
+  [
+    check('token', 'token is required').not().isEmpty(),
+    check('token', 'token is not valid').custom(isValidToken),
+    fieldValidation,
+  ],
+  verifyEmail
 );
+
+router
+  .route('/forgot-password')
+  .post([check('email', 'Invalid email').isEmail(), check('email').custom(isEmailUnique), fieldValidation], verifyEmail);
+
+router
+  .route('/reset-password/:token')
+  .post(
+    [
+      check('token', 'token is required').not().isEmpty(),
+      check('token', 'token is not valid').custom(isValidToken),
+      check('password').custom(weakPassword),
+      fieldValidation,
+    ],
+    verifyEmail
+  );
 
 // TODO: actualizar esta entrada
 /**
@@ -165,7 +185,7 @@ router.route('/verify-email/:token').post(
  *                   null
  */
 
-router.route('/logout').post([authorize(tokenTypes.ACCESS, 'ADMIN_ROLE', 'USER_ROLE'), fieldValidation], logout);
+router.route('/logout').post([authorize(tokenTypes.REFRESH, 'ADMIN_ROLE', 'USER_ROLE'), fieldValidation], logout);
 router
   .route('/reauthenticate')
   .post([authorize(tokenTypes.REFRESH, 'ADMIN_ROLE', 'USER_ROLE'), fieldValidation], reAuthenticate);

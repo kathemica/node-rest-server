@@ -120,7 +120,7 @@ const router = Router();
 
 router.route('/').get(
   // get all users
-  [authorize(tokenTypes.ACCESS, 'ADMIN_ROLE', 'USER_ROLE', 'SALES_ROLE')],
+  [authorize(tokenTypes.ACCESS, 'ADMIN_ROLE', 'USER_ROLE')],
   userGet
 );
 // .post(
