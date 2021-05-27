@@ -12,9 +12,7 @@ const envVarsSchema = Joi.object()
     APP_PATH: Joi.string()
       .default(process.env.INIT_CWD || '')
       .description('Base app path'),
-    SERVER_FINGERKEY: Joi.string()
-      .default(process.env.INIT_CWD || '')
-      .description('Server Random Key '),
+    SERVER_FINGERKEY: Joi.string().default('Q{8VJX-?vYu98a9U{b}@jG+M').description('Server Random Key '),
     SERVER_URL: Joi.string().default(process.env.SERVER_URL).description('Base app path'),
     PORT: Joi.number().default(8080),
     MONGO_URL: Joi.string()
