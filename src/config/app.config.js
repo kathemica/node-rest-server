@@ -12,6 +12,9 @@ const envVarsSchema = Joi.object()
     APP_PATH: Joi.string()
       .default(process.env.INIT_CWD || '')
       .description('Base app path'),
+    SERVER_URL: Joi.string()
+      .default(process.env.SERVER_URL || 'http://localhost')
+      .description('Base app path'),
     PORT: Joi.number().default(8080),
     MONGO_URL: Joi.string()
       .default(process.env.MONGO_URL || '')
@@ -29,11 +32,10 @@ const envVarsSchema = Joi.object()
     JWT_VERIFY_EMAIL_EXPIRATION_MINUTES: Joi.string()
       .default('10m')
       .description('minutes after which verify email token expires'),
-    SMTP_HOST: Joi.string().description('server that will send the emails'),
-    SMTP_PORT: Joi.number().description('port to connect to the email server'),
-    SMTP_USERNAME: Joi.string().description('username for email server'),
-    SMTP_PASSWORD: Joi.string().description('password for email server'),
-    EMAIL_FROM: Joi.string().description('the from field in the emails sent by the app'),
+    MAIL_OWNER: Joi.string().description('owner for mail service'),
+    MAIL_USERNAME: Joi.string().description('username for email server'),
+    MAIL_FROM: Joi.string().description('the from field in the emails sent by the app'),
+    SENDGRID_API_KEY: Joi.string().default('').description('SENDGRID_API_KEY'),
     CA_CERT: Joi.string().default('').description('The path for CA Cert file'),
     KEY_CERT: Joi.string().default('').description('The path for Key Cert file'),
     PEM_CERT: Joi.string().default('').description('The path for PEM Cert file'),
@@ -55,6 +57,14 @@ const { APP_PATH } = envVars;
 const VERSION = envVars.npm_package_version;
 const env = envVars.NODE_ENV;
 const { PORT } = envVars;
+const SERVER_URL = `${envVars.SERVER_URL}:${PORT}`;
+
+const emailConfig = {
+  owner: envVars.MAIL_OWNER,
+  username: envVars.MAIL_USERNAME,
+  from: envVars.MAIL_FROM,
+  SENDGRID_API_KEY: envVars.SENDGRID_API_KEY,
+};
 
 const mongooseConfig = {
   url: envVars.MONGO_URL + (envVars.NODE_ENV === 'test' ? '-test' : ''),
@@ -86,17 +96,5 @@ const googleConfig = {
   GOOGLE_SECRET_ID: envVars.GOOGLE_SECRET_ID,
 };
 
-const emailConfig = {
-  smtp: {
-    host: envVars.SMTP_HOST,
-    port: envVars.SMTP_PORT,
-    auth: {
-      user: envVars.SMTP_USERNAME,
-      pass: envVars.SMTP_PASSWORD,
-    },
-  },
-  from: envVars.EMAIL_FROM,
-};
-
-export default emailConfig;
-export { APP_PATH, VERSION, env, PORT, mongooseConfig, jwtConfig, googleConfig };
+// eslint-disable-next-line import/prefer-default-export
+export { emailConfig, APP_PATH, VERSION, env, PORT, SERVER_URL, mongooseConfig, jwtConfig, googleConfig };

@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { check } from 'express-validator';
 
-import { isEmailUnique } from '../utils/index.js';
+import { isEmailUnique, weakPassword, isValidRol, existsID } from '../utils/index.js';
 import { authorize } from '../middlewares/index.js';
 import { fieldValidation } from '../validations/index.js';
-import { login, logout, loginGoogle, reAuthenticate } from '../controllers/index.js';
+import { signup, login, logout, loginGoogle, reAuthenticate } from '../controllers/index.js';
+import { tokenTypes } from '../config/tokens.enum.js';
 
 const router = Router();
 
@@ -78,6 +79,27 @@ router.post(
   login
 );
 
+router.route('/singup').post(
+  //  create user
+  [
+    authorize(tokenTypes.ACCESS, 'ADMIN_ROLE'),
+    check('firstName', 'First name is required').not().isEmpty(),
+    check('lastName', 'Last name is required').not().isEmpty(),
+    check('email', 'Invalid email').isEmail(),
+    check('email').custom(isEmailUnique),
+    check('password').custom(weakPassword),
+    check('role').custom(isValidRol),
+    fieldValidation,
+  ],
+  signup
+);
+
+router.route('/verify-email/:token').post(
+  //  create user
+  [check('id', 'Id is not valid').isMongoId(), check('id').custom(existsID), fieldValidation],
+  signup
+);
+
 // TODO: actualizar esta entrada
 /**
  * @swagger
@@ -142,8 +164,11 @@ router.post(
  *                 body:
  *                   null
  */
-router.route('/logout').post([authorize('ADMIN_ROLE', 'USER_ROLE'), fieldValidation], logout);
-router.route('/reauthenticate').post([authorize('ADMIN_ROLE', 'USER_ROLE'), fieldValidation], reAuthenticate);
+
+router.route('/logout').post([authorize(tokenTypes.ACCESS, 'ADMIN_ROLE', 'USER_ROLE'), fieldValidation], logout);
+router
+  .route('/reauthenticate')
+  .post([authorize(tokenTypes.REFRESH, 'ADMIN_ROLE', 'USER_ROLE'), fieldValidation], reAuthenticate);
 
 /**
  * @swagger

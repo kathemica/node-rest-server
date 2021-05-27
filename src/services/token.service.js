@@ -163,6 +163,18 @@ const getRefreshToken = async (user, fingerprint) => {
   };
 };
 
+/**
+ * Generate verify email token
+ * @param {User} user
+ * @returns {Promise<string>}
+ */
+const generateVerifyEmailToken = async (user, fingerprint) => {
+  const expires = moment().add(jwtConfig.verifyEmailExpirationMinutes, 'minutes');
+  const verifyEmailToken = getAccessToken(user.id, expires, tokenTypes.VERIFY_EMAIL);
+  await saveToken(verifyEmailToken, user.id, fingerprint, expires, tokenTypes.VERIFY_EMAIL);
+  return verifyEmailToken;
+};
+
 //------------------------------------------------------------
 const generateJWT = (uuid = '') => {
   return new Promise((resolve, reject) => {
@@ -216,31 +228,6 @@ const generateJWT = (uuid = '') => {
 // };
 
 // /**
-//  * Generate auth tokens
-//  * @param {User} user
-//  * @returns {Promise<Object>}
-//  */
-// const getRefreshToken = async (user) => {
-//   const accessTokenExpires = moment().add(jwtConfig.accessExpirationMinutes, 'minutes');
-//   const accessToken = generateToken(user.id, accessTokenExpires, tokenTypes.ACCESS);
-
-//   const refreshTokenExpires = moment().add(jwtConfig.refreshExpirationDays, 'days');
-//   const refreshToken = generateToken(user.id, refreshTokenExpires, tokenTypes.REFRESH);
-//   await saveToken(refreshToken, user.id, refreshTokenExpires, tokenTypes.REFRESH);
-
-//   return {
-//     access: {
-//       token: accessToken,
-//       expires: accessTokenExpires.toDate(),
-//     },
-//     refresh: {
-//       token: refreshToken,
-//       expires: refreshTokenExpires.toDate(),
-//     },
-//   };
-// };
-
-// /**
 //  * Generate reset password token
 //  * @param {string} email
 //  * @returns {Promise<string>}
@@ -256,18 +243,6 @@ const generateJWT = (uuid = '') => {
 //   return resetPasswordToken;
 // };
 
-// /**
-//  * Generate verify email token
-//  * @param {User} user
-//  * @returns {Promise<string>}
-//  */
-// const generateVerifyEmailToken = async (user) => {
-//   const expires = moment().add(jwtConfig.verifyEmailExpirationMinutes, 'minutes');
-//   const verifyEmailToken = generateToken(user.id, expires, tokenTypes.VERIFY_EMAIL);
-//   await saveToken(verifyEmailToken, user.id, expires, tokenTypes.VERIFY_EMAIL);
-//   return verifyEmailToken;
-// };
-
 // eslint-disable-next-line import/prefer-default-export
 export {
   generateJWT,
@@ -276,8 +251,8 @@ export {
   verifyToken,
   deleteUserTokens,
   saveToken,
+  generateVerifyEmailToken,
   // verifyToken,
   // getRefreshToken,
   // generateResetPasswordToken,
-  // generateVerifyEmailToken,
 };

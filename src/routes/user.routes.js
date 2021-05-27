@@ -4,7 +4,8 @@ import { check } from 'express-validator';
 import { authorize } from '../middlewares/index.js';
 import { fieldValidation } from '../validations/index.js';
 import { isValidRol, isEmailUnique, existsID, weakPassword } from '../utils/index.js';
-import { userGet, userGetOne, userPost, userPatch, userDelete } from '../controllers/index.js';
+import { userGet, userGetOne, userPatch, userDelete } from '../controllers/index.js';
+import { tokenTypes } from '../config/index.js';
 
 const router = Router();
 
@@ -117,22 +118,25 @@ const router = Router();
  *         $ref: '#/components/schemas/Error'
  */
 
-router
-  .route('/')
-  .get([authorize('ADMIN_ROLE', 'USER_ROLE', 'SALES_ROLE')], userGet)
-  .post(
-    [
-      authorize('ADMIN_ROLE'),
-      check('firstName', 'First name is required').not().isEmpty(),
-      check('lastName', 'Last name is required').not().isEmpty(),
-      check('email', 'Invalid email').isEmail(),
-      check('email').custom(isEmailUnique),
-      check('password').custom(weakPassword),
-      check('role').custom(isValidRol),
-      fieldValidation,
-    ],
-    userPost
-  );
+router.route('/').get(
+  // get all users
+  [authorize(tokenTypes.ACCESS, 'ADMIN_ROLE', 'USER_ROLE', 'SALES_ROLE')],
+  userGet
+);
+// .post(
+//   // create user
+//   [
+//     authorize('ADMIN_ROLE'),
+//     check('firstName', 'First name is required').not().isEmpty(),
+//     check('lastName', 'Last name is required').not().isEmpty(),
+//     check('email', 'Invalid email').isEmail(),
+//     check('email').custom(isEmailUnique),
+//     check('password').custom(weakPassword),
+//     check('role').custom(isValidRol),
+//     fieldValidation,
+//   ],
+//   userPost
+// );
 
 /**
  * @swagger
@@ -285,7 +289,7 @@ router
   .route('/:id')
   .get(
     [
-      authorize('ADMIN_ROLE', 'USER_ROLE', 'SALES_ROLE'),
+      authorize(tokenTypes.ACCESS, 'ADMIN_ROLE', 'USER_ROLE', 'SALES_ROLE'),
       check('id', 'Id is not valid').isMongoId(),
       check('id').custom(existsID),
       fieldValidation,
@@ -294,7 +298,7 @@ router
   )
   .patch(
     [
-      authorize('ADMIN_ROLE'),
+      authorize(tokenTypes.ACCESS, 'ADMIN_ROLE'),
       check('id', 'Id is not valid').isMongoId(),
       check('id').custom(existsID),
       check('email', 'Invalid email').optional().isEmail(),
@@ -307,7 +311,7 @@ router
   )
   .delete(
     [
-      authorize('ADMIN_ROLE'),
+      authorize(tokenTypes.ACCESS, 'ADMIN_ROLE'),
       check('id', 'Id is empty').not().isEmpty(),
       check('id', 'Id is not valid').isMongoId(),
       check('id').custom(existsID),

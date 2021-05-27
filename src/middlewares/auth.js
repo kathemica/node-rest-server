@@ -1,12 +1,12 @@
 import httpStatus from 'http-status';
 import _ from 'lodash';
-import { logger, tokenTypes } from '../config/index.js';
+import { logger } from '../config/index.js';
 import { ApiError, checkLanguageHeader, checkAutorizationHeader, responseObjectBuilder } from '../utils/index.js';
 import { validateUser } from '../validations/index.js';
 import { verifyToken } from '../services/token.service.js';
 
 const authorize =
-  (...requiredRoles) =>
+  (tokenType, ...requiredRoles) =>
   async (req, res, next) => {
     try {
       req.language = checkLanguageHeader(req);
@@ -15,7 +15,7 @@ const authorize =
 
       const fingerprint = req.fingerprint.hash;
 
-      const tokenInfo = await verifyToken(token, tokenTypes.REFRESH, fingerprint);
+      const tokenInfo = await verifyToken(token, tokenType, fingerprint);
 
       const user = await validateUser(tokenInfo.user, requiredRoles);
 

@@ -45,25 +45,6 @@ const userGet = async (req, res = response) => {
   }
 };
 
-// create a new user
-const userPost = async (req, res = response) => {
-  try {
-    const { firstName, lastName, email, password, role } = req.body;
-    const user = new Users({ firstName, lastName, email, password, role });
-
-    // encript pass
-    const salt = bcryptjs.genSaltSync();
-    user.password = bcryptjs.hashSync(password, salt);
-
-    await user.save();
-
-    return responseObjectBuilder(res, httpStatus.OK, `Success`, `Create success`, '', user);
-  } catch (error) {
-    logger.error(`Error: ${error}`);
-    return responseObjectBuilder(res, httpStatus.INTERNAL_SERVER_ERROR, `Error`, `Create failure`, error.message);
-  }
-};
-
 // update a user
 const userPatch = async (req, res = response) => {
   try {
@@ -115,4 +96,4 @@ const userDelete = async (req, res = response) => {
   }
 };
 
-export { userGet, userGetOne, userPost, userPatch, userDelete };
+export { userGet, userGetOne, userPatch, userDelete };

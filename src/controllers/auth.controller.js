@@ -13,7 +13,36 @@ import {
   verifyToken,
   getAccessToken,
   saveToken,
+  generateVerifyEmailToken,
 } from '../services/token.service.js';
+import { sendVerificationEmail } from '../services/email.service.js';
+
+// create user without email account activation
+const signup = async (req, res = response) => {
+  try {
+    const { firstName, lastName, email, password, role } = req.body;
+    const user = new Users({ firstName, lastName, email, password, role });
+
+    // encript pass
+    const salt = bcryptjs.genSaltSync();
+    user.password = bcryptjs.hashSync(password, salt);
+
+    await user.save();
+    // const data = {
+    //   to: email,
+    //   subject: 'account created',
+    //   text: 'testing content',
+    // };
+
+    const confirmToken = await generateVerifyEmailToken(user, req.fingerprint.hash);
+    await sendVerificationEmail(email, confirmToken);
+
+    return responseObjectBuilder(res, httpStatus.OK, `Success`, `Create success`, '', user);
+  } catch (error) {
+    logger.error('signup failure');
+    return responseObjectBuilder(res, error.statusCode, `Error`, `Signup failure`, error.message);
+  }
+};
 
 /**
  * Login with username and password
@@ -156,4 +185,4 @@ const loginGoogle = async (req, res = response) => {
   }
 };
 
-export { login, loginGoogle, logout, reAuthenticate };
+export { signup, login, loginGoogle, logout, reAuthenticate };

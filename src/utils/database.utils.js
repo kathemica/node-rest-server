@@ -12,7 +12,7 @@ const isValidRol = async (role = '') => {
 const isEmailUnique = async (email = '') => {
   const exists = await Users.findOne({ email });
   if (exists) {
-    throw new Error(`Email ${email} exists in db`);
+    throw new Error(`Email ${email} already taken`);
   }
 };
 
