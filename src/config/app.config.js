@@ -57,7 +57,7 @@ const VERSION = envVars.npm_package_version;
 const env = envVars.NODE_ENV;
 const { PORT } = envVars;
 const { SERVER_FINGERKEY } = envVars;
-const SERVER_URL = `${envVars.SERVER_URL}:${PORT}`;
+const SERVER_URL = `${envVars.SERVER_URL}`;
 
 const emailConfig = {
   owner: envVars.MAIL_OWNER,
