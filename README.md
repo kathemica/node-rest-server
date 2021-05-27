@@ -9,14 +9,14 @@
 [![GitHub forks](https://img.shields.io/github/forks/kathemica/node-rest-server?style=plastic)](https://github.com/kathemica/node-rest-server/network)
 [![GitHub stars](https://img.shields.io/github/stars/kathemica/node-rest-server?style=plastic)](https://github.com/kathemica/node-rest-server/stargazers)
 ![GitHub last commit](https://img.shields.io/github/last-commit/kathemica/node-rest-server?color=red&style=plastic)
-![GitHub last commit](https://img.shields.io/github/commits-since/kathemica/node-rest-server/V1.0.2.svg?color=yellow&style=plastic)
+![GitHub top language](https://img.shields.io/github/languages/top/kathemica/node-rest-server?style=plastic)
+![GitHub version commits](https://img.shields.io/github/commits-since/kathemica/node-rest-server/V1.0.2.svg?color=yellow&style=plastic)
 ![Maintaned](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=plastic)
 <br>
 [![GitHub license](https://img.shields.io/github/license/kathemica/node-rest-server?style=plastic)](https://github.com/kathemica/node-rest-server/blob/main/LICENSE)
 ![GitHub repo size](https://img.shields.io/github/repo-size/kathemica/node-rest-server?style=plastic)
 <br>
-![Bars](https://github-readme-stats.vercel.app/api/top-langs/?username=kathemica&theme=yellow-blue)
-<br>
+
 
 # node-rest-server
 REST server with NODE
