@@ -1,10 +1,19 @@
 import { Router } from 'express';
 import { check } from 'express-validator';
 
-import { isEmailUnique, weakPassword, isValidRol, isValidToken } from '../utils/index.js';
+import { isEmailUnique, weakPassword, isValidRol, isValidEmailToken, isValidResetToken } from '../utils/index.js';
 import { authorize } from '../middlewares/index.js';
 import { fieldValidation } from '../validations/index.js';
-import { signup, login, logout, loginGoogle, reAuthenticate, verifyEmail } from '../controllers/index.js';
+import {
+  signup,
+  login,
+  logout,
+  loginGoogle,
+  reAuthenticate,
+  verifyEmail,
+  forgotPassword,
+  resetPassword,
+} from '../controllers/index.js';
 import { tokenTypes } from '../config/tokens.enum.js';
 
 const router = Router();
@@ -79,6 +88,7 @@ router.post(
   login
 );
 
+// create and activate user
 router.route('/singup').post(
   //  create user
   [
@@ -98,26 +108,35 @@ router.route('/verify-email/:token').get(
   //  create user - verify
   [
     check('token', 'token is required').not().isEmpty(),
-    check('token', 'token is not valid').custom(isValidToken),
+    check('token', 'token is not valid').custom(isValidEmailToken),
     fieldValidation,
   ],
   verifyEmail
 );
 
+// reset a password
 router
   .route('/forgot-password')
-  .post([check('email', 'Invalid email').isEmail(), check('email').custom(isEmailUnique), fieldValidation], verifyEmail);
+  .post(
+    [
+      check('email', 'Invalid email').isEmail(),
+      check('token', 'token is not required').isEmpty(),
+      check('email', "Email doesn't exists").not().custom(isEmailUnique),
+      fieldValidation,
+    ],
+    forgotPassword
+  );
 
 router
   .route('/reset-password/:token')
-  .post(
+  .patch(
     [
       check('token', 'token is required').not().isEmpty(),
-      check('token', 'token is not valid').custom(isValidToken),
+      check('token', 'token is not valid').custom(isValidResetToken),
       check('password').custom(weakPassword),
       fieldValidation,
     ],
-    verifyEmail
+    resetPassword
   );
 
 // TODO: actualizar esta entrada

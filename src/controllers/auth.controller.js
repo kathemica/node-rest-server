@@ -4,19 +4,20 @@ import httpStatus from 'http-status';
 import moment from 'moment';
 import cryptoRandomString from 'crypto-random-string';
 
-import { Users } from '../models/index.js';
+import { Token, Users } from '../models/index.js';
 import { jwtConfig, logger, tokenTypes } from '../config/index.js';
 import { responseObjectBuilder, googleVerify, ApiError, checkAutorizationHeader } from '../utils/index.js';
+import { sendVerificationEmail, sendResetPasswordEmail } from '../services/email.service.js';
 import {
   generateJWT,
   getRefreshToken,
   deleteUserTokens,
   verifyToken,
-  getAccessToken,
+  getTypedToken,
   saveToken,
   generateVerifyEmailToken,
+  generateResetPasswordToken,
 } from '../services/token.service.js';
-import { sendVerificationEmail } from '../services/email.service.js';
 
 /**
  * Login with username and password
@@ -50,7 +51,7 @@ const login = async (req, res = response) => {
       tokens: tokenTupla,
     });
   } catch (error) {
-    logger.error('Login failure');
+    logger.error(error);
     return responseObjectBuilder(res, error.statusCode, `Error`, `Login failure`, error.message);
   }
 };
@@ -72,7 +73,7 @@ const logout = async (req = request, res = response) => {
 
     await deleteUserTokens({ user: user.id, fingerprint });
 
-    return responseObjectBuilder(res, httpStatus.OK, 'Success', `Logout success`, '', user);
+    return responseObjectBuilder(res, httpStatus.NO_CONTENT);
   } catch (error) {
     logger.error('Logout failure');
     return responseObjectBuilder(res, error.statusCode || 500, `Error`, `Logout failure`, error.message);
@@ -103,7 +104,7 @@ const reAuthenticate = async (req = request, res = response) => {
     // AT
     // We validate that it do not have more than one AT per fingerprint
     const accessTokenExpires = moment().add(jwtConfig.accessExpirationMinutes, 'minutes');
-    const accessToken = getAccessToken(tokenDoc.user, accessTokenExpires, tokenTypes.ACCESS);
+    const accessToken = getTypedToken(tokenDoc.user, accessTokenExpires, tokenTypes.ACCESS);
     await saveToken(accessToken, tokenDoc.user, fingerprint, accessTokenExpires, tokenTypes.ACCESS);
 
     res.setHeader('Autorization', `Bearer ${accessToken}`);
@@ -174,7 +175,7 @@ const signup = async (req, res = response) => {
     const confirmToken = await generateVerifyEmailToken(user, req.fingerprint.hash);
     await sendVerificationEmail(email, confirmToken);
 
-    return responseObjectBuilder(res, httpStatus.OK, `Success`, `Create success`, '', user);
+    return responseObjectBuilder(res, httpStatus.CREATED, `Success`, `Create success`, '', user);
   } catch (error) {
     logger.error('signup failure');
     return responseObjectBuilder(res, error.statusCode, `Error`, `Signup failure`, error.message);
@@ -189,8 +190,9 @@ const verifyEmail = async (req, res = response) => {
     const tokenDoc = await verifyToken(token, tokenTypes.VERIFY_EMAIL);
 
     const user = await Users.findByIdAndUpdate(tokenDoc.user, { isActive: true }, { returnOriginal: false });
+    await Token.updateMany({ user: user.id, type: tokenTypes.VERIFY_EMAIL }, { blacklisted: true });
 
-    return responseObjectBuilder(res, httpStatus.OK, 'Success', 'verifyEmail', user);
+    return responseObjectBuilder(res, httpStatus.OK, 'Success', 'Verify email ok', user);
   } catch (error) {
     logger.error('verifyEmail failure');
     return responseObjectBuilder(res, error.statusCode, `Error`, `Verifying email failure: `, error.message);
@@ -200,9 +202,11 @@ const verifyEmail = async (req, res = response) => {
 // get link for reset password
 const forgotPassword = async (req, res = response) => {
   try {
-    return responseObjectBuilder(res, httpStatus.NOT_IMPLEMENTED, 'Success', 'function not implmented yet');
+    const resetPasswordToken = await generateResetPasswordToken(req.body.email, req.fingerprint.hash);
+    await sendResetPasswordEmail(req.body.email, resetPasswordToken);
+    return responseObjectBuilder(res, httpStatus.NO_CONTENT);
   } catch (error) {
-    logger.error('verifyEmail failure');
+    logger.error('Forgot Password failure');
     return responseObjectBuilder(res, error.statusCode, `Error`, `Forgot password failure: `, error.message);
   }
 };
@@ -210,7 +214,45 @@ const forgotPassword = async (req, res = response) => {
 // execute password change action
 const resetPassword = async (req, res = response) => {
   try {
-    return responseObjectBuilder(res, httpStatus.NOT_IMPLEMENTED, 'Success', 'function not implmented yet');
+    const { token } = req.params;
+    let { password } = req.body;
+
+    // console.log(token);
+    // console.log(password);
+
+    // encript pass
+    const salt = bcryptjs.genSaltSync();
+    password = bcryptjs.hashSync(password, salt);
+
+    // console.log(password);
+
+    const resetPasswordTokenDoc = await verifyToken(token, tokenTypes.RESET_PASSWORD);
+    // console.log(resetPasswordTokenDoc);
+
+    // eslint-disable-next-line prefer-const
+    let user = await Users.findById(resetPasswordTokenDoc.user);
+    // console.log(user);
+
+    if (!user || !user.isActive) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Account is disabled or User was delete');
+    }
+
+    const userUpdated = await Users.findByIdAndUpdate(
+      user.id,
+      { password },
+      {
+        returnOriginal: false,
+      }
+    );
+
+    await Token.updateMany({ user: user.id, type: tokenTypes.RESET_PASSWORD }, { blacklisted: true });
+
+    // console.log(userUpdated);
+
+    // const newUser = await Users.findByIdAndUpdate(user.id, { password }, { returnOriginal: false });
+
+    // console.log(newUser);
+    return responseObjectBuilder(res, httpStatus.Ok, 'Success', 'Reset password Ok', userUpdated);
   } catch (error) {
     logger.error('verifyEmail failure');
     return responseObjectBuilder(res, error.statusCode, `Error`, `Reset password failure: `, error.message);

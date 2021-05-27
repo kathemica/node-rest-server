@@ -4,7 +4,7 @@ import httpStatus from 'http-status';
 
 import { ApiError } from '../utils/ApiError.utils.js';
 import { jwtConfig, logger, tokenTypes } from '../config/index.js';
-import { Token } from '../models/index.js';
+import { Token, Users } from '../models/index.js';
 // import { tokenTypes } from '../config/tokens.enum.js';
 // import userService from './user.service';
 
@@ -70,7 +70,7 @@ const verifyToken = async (token = '', type = tokenTypes, fingerprint = '') => {
  * @returns {string}
  */
 // TODO: estos tokens no se almacenan, deben vencer rapido
-const getAccessToken = (uuid, expires, type, secret = jwtConfig.secret) => {
+const getTypedToken = (uuid, expires, type, secret = jwtConfig.secret) => {
   const payload = {
     sub: uuid,
     iat: moment().unix(),
@@ -148,11 +148,11 @@ const getRefreshToken = async (user, fingerprint) => {
   // AT
   // We validate that it do not have more than one AT per fingerprint
   const accessTokenExpires = moment().add(jwtConfig.accessExpirationMinutes, 'minutes');
-  const accessToken = getAccessToken(user.id, accessTokenExpires, tokenTypes.ACCESS);
+  const accessToken = getTypedToken(user.id, accessTokenExpires, tokenTypes.ACCESS);
   await saveToken(accessToken, user.id, fingerprint, accessTokenExpires, tokenTypes.ACCESS);
 
   const refreshTokenExpires = moment().add(jwtConfig.refreshExpirationDays, 'days');
-  const refreshToken = getAccessToken(user.id, refreshTokenExpires, tokenTypes.REFRESH);
+  const refreshToken = getTypedToken(user.id, refreshTokenExpires, tokenTypes.REFRESH);
   await saveToken(refreshToken, user.id, fingerprint, refreshTokenExpires, tokenTypes.REFRESH);
 
   return {
@@ -174,9 +174,25 @@ const getRefreshToken = async (user, fingerprint) => {
  */
 const generateVerifyEmailToken = async (user, fingerprint) => {
   const expires = moment().add(jwtConfig.verifyEmailExpirationMinutes, 'minutes');
-  const verifyEmailToken = getAccessToken(user.id, expires, tokenTypes.VERIFY_EMAIL);
+  const verifyEmailToken = getTypedToken(user.id, expires, tokenTypes.VERIFY_EMAIL);
   await saveToken(verifyEmailToken, user.id, fingerprint, expires, tokenTypes.VERIFY_EMAIL);
   return verifyEmailToken;
+};
+
+/**
+ * Generate reset password token
+ * @param {string} email
+ * @returns {Promise<string>}
+ */
+const generateResetPasswordToken = async (email, fingerprint) => {
+  const user = await Users.findOne({ email });
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No users found with this email');
+  }
+  const expires = moment().add(jwtConfig.resetPasswordExpirationMinutes, 'minutes');
+  const resetPasswordToken = getTypedToken(user.id, expires, tokenTypes.RESET_PASSWORD);
+  await saveToken(resetPasswordToken, user.id, fingerprint, expires, tokenTypes.RESET_PASSWORD);
+  return resetPasswordToken;
 };
 
 //------------------------------------------------------------
@@ -231,32 +247,16 @@ const generateJWT = (uuid = '') => {
 //   return tokenDoc;
 // };
 
-// /**
-//  * Generate reset password token
-//  * @param {string} email
-//  * @returns {Promise<string>}
-//  */
-// const generateResetPasswordToken = async (email) => {
-//   const user = await userService.getUserByEmail(email);
-//   if (!user) {
-//     throw new ApiError(httpStatus.NOT_FOUND, 'No users found with this email');
-//   }
-//   const expires = moment().add(jwtConfig.resetPasswordExpirationMinutes, 'minutes');
-//   const resetPasswordToken = generateToken(user.id, expires, tokenTypes.RESET_PASSWORD);
-//   await saveToken(resetPasswordToken, user.id, expires, tokenTypes.RESET_PASSWORD);
-//   return resetPasswordToken;
-// };
-
 // eslint-disable-next-line import/prefer-default-export
 export {
   generateJWT,
-  getAccessToken,
+  getTypedToken,
   getRefreshToken,
   verifyToken,
   deleteUserTokens,
   saveToken,
   generateVerifyEmailToken,
+  generateResetPasswordToken,
   // verifyToken,
   // getRefreshToken,
-  // generateResetPasswordToken,
 };

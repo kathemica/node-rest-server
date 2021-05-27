@@ -41,7 +41,7 @@ const weakPassword = async (password = '') => {
 };
 
 // check valid token
-const isValidToken = async (token = '') => {
+const isValidEmailToken = async (token = '') => {
   const payload = await verifyToken(token, tokenTypes.VERIFY_EMAIL);
 
   if (!payload) {
@@ -51,5 +51,16 @@ const isValidToken = async (token = '') => {
   return true;
 };
 
+// check valid token
+const isValidResetToken = async (token = '') => {
+  const payload = await verifyToken(token, tokenTypes.RESET_PASSWORD);
+
+  if (!payload) {
+    throw new Error(`Token doesn't exists in db`);
+  }
+
+  return true;
+};
+
 // eslint-disable-next-line import/prefer-default-export
-export { isValidRol, isEmailUnique, existsID, weakPassword, isValidToken };
+export { isValidRol, isEmailUnique, existsID, weakPassword, isValidEmailToken, isValidResetToken };
