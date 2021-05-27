@@ -14,8 +14,8 @@
 <br>
 [![GitHub license](https://img.shields.io/github/license/kathemica/node-rest-server?style=plastic)](https://github.com/kathemica/node-rest-server/blob/main/LICENSE)
 ![GitHub repo size](https://img.shields.io/github/repo-size/kathemica/node-rest-server?style=plastic)
-![Bars](https://github-readme-stats.vercel.app/api/top-langs/?username=kathemica&theme=blue-green)
-
+<br>
+![Bars](https://github-readme-stats.vercel.app/api/top-langs/?username=kathemica&theme=yellow-blue)
 <br>
 
 # node-rest-server
