@@ -44,7 +44,7 @@ const saveToken = async (token, userId, fingerprint, expires, type = '', blackli
  */
 const verifyToken = async (token = '', type = tokenTypes, fingerprint = '') => {
   try {
-    const payload = jwt.verify(token, jwtConfig.secret);
+    const payload = jwt.verify(token, jwtConfig.SECRET);
 
     // eslint-disable-next-line prefer-const
     let query = { token, type, user: payload.sub, blacklisted: false };
@@ -57,7 +57,7 @@ const verifyToken = async (token = '', type = tokenTypes, fingerprint = '') => {
     return tokenDoc;
   } catch (err) {
     logger.error(err);
-    throw new ApiError(httpStatus.UNAUTHORIZED, `Failure on Security Token [${err}]`);
+    throw new ApiError(httpStatus.UNAUTHORIZED, `Failure on Security Token, [${err.message}]`);
   }
 };
 
@@ -70,7 +70,7 @@ const verifyToken = async (token = '', type = tokenTypes, fingerprint = '') => {
  * @returns {string}
  */
 // TODO: estos tokens no se almacenan, deben vencer rapido
-const getTypedToken = (uuid, expires, type, secret = jwtConfig.secret) => {
+const getTypedToken = (uuid, expires, type, secret = jwtConfig.SECRET) => {
   const payload = {
     sub: uuid,
     iat: moment().unix(),
@@ -123,8 +123,8 @@ const getRefreshToken = async (user, fingerprint) => {
   // We validate that it does not have more than 5 RTs in total, else we delete them to create a new one
   if (RTTotalGeneral >= 5) {
     await deleteUserTokens(queries.RTTotalGeneral).then(
-      logger.info(
-        `User: ${user.id} was trying to create more than 5 refresh tokens, therefore all of those were erades and created a new one`
+      logger.warning(
+        `User: ${user.id} was trying to create more than enabled refresh tokens.`
       )
     );
   }
@@ -132,7 +132,7 @@ const getRefreshToken = async (user, fingerprint) => {
   if (RTTotalWithSameFingerprint > 0) {
     await deleteUserTokens(queries.RTTotalWithSameFingerprint).then(
       logger.info(
-        `User: ${user.id} was trying to create more than 1 refresh tokens for the same device, therefore all of those were erades and created a new one`
+        `User: ${user.id} was trying to create more than available refresh tokens for the same device.`
       )
     );
   }
@@ -140,7 +140,7 @@ const getRefreshToken = async (user, fingerprint) => {
   if (ATTotalWithSameFingerprint > 0) {
     await deleteUserTokens(queries.ATTotalWithSameFingerprint).then(
       logger.info(
-        `User: ${user.id} was trying to create more than 1 access tokens for the same device, therefore all of those were erades and created a new one`
+        `User: ${user.id} was trying to create more than available refresh tokens for the same device.`
       )
     );
   }

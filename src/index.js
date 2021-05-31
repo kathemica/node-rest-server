@@ -1,7 +1,7 @@
 import App from './App.js';
-import { logger } from './config/index.js';
+import { logger, serverConfig } from './config/index.js';
 
-const app = new App();
+const app = new App(serverConfig.isHTTPS);
 
 app.start();
 

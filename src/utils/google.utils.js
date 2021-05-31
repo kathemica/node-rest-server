@@ -20,7 +20,7 @@ const googleVerify = async (idToken = '') => {
     return { firstName, lastName, email, image };
   } catch (error) {
     logger.error(`Error on googleVerify: ${error}`);
-    throw new Error(`Error on googleVerify: ${error}`);
+    throw new Error(`Error on googleVerify: ${error.message}`);
   }
 };
 

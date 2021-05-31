@@ -44,6 +44,12 @@
       "zxh404.vscode-proto3",
       "mikestead.dotenv",
       "editorconfig.editorconfig",
-      "ms-vscode.azurecli"
+      "ms-vscode.azurecli",
+      "orta.vscode-jest",
+      "andys8.jest-snippets",
+      "kavod-io.vscode-jest-test-adapter",
+      "swellaby.vscode-rust-test-adapter",
+      "ms-vscode.test-adapter-converter",
+      "hbenl.vscode-test-explorer"
     ]
 }

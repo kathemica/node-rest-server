@@ -5,7 +5,7 @@ const generateJWT = (uuid = '') => {
   return new Promise((resolve, reject) => {
     const payload = { uuid };
 
-    jwt.sign(payload, jwtConfig.secret, { expiresIn: jwtConfig.accessExpirationMinutes }, (err, token) => {
+    jwt.sign(payload, jwtConfig.SECRET, { expiresIn: jwtConfig.accessExpirationMinutes }, (err, token) => {
       if (err) {
         logger.error(err);
         // eslint-disable-next-line prefer-promise-reject-errors

@@ -6,7 +6,7 @@
   "scripts": {
     "about": "set NODE_ENV=development&&node about",
     "dev": "set NODE_ENV=development&&nodemon ./src/index DEBUG=mquery",
-    "dev-prod": "set NODE_ENV=production&&nodemon ./src/index",
+    "dev:prod": "set NODE_ENV=production&&nodemon ./src/index",
     "start": "node ./src/index",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -14,8 +14,12 @@
     "prettier:fix": "prettier --write **/*.js",
     "test": "jest -i --colors --verbose --detectOpenHandles",
     "test:watch": "jest -i --watchAll",
-    "coverage": "jest -i --coverage",
-    "coverage:coveralls": "jest -i --coverage --coverageReporters=text-lcov | coveralls"
+    "coverage": "jest -i --coverage"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest"
+    }
   },
   "repository": {
     "type": "git",
@@ -43,6 +47,7 @@
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "crypto-random-string": "^2.0.0",
+    "ddos": "^0.2.1",
     "dotenv": "^9.0.1",
     "express": "^4.17.1",
     "express-fingerprint": "^1.2.2",
@@ -63,8 +68,10 @@
     "winston": "^3.3.3"
   },
   "devDependencies": {
+    "@babel/cli": "^7.14.3",
     "@babel/core": "^7.14.3",
     "@babel/eslint-parser": "^7.14.3",
+    "@babel/preset-env": "^7.14.4",
     "eslint": "^7.27.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^8.3.0",

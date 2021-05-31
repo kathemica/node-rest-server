@@ -9,6 +9,52 @@ import { tokenTypes } from '../config/index.js';
 
 const router = Router();
 
+router
+  .route('/')
+  .get(
+    // get all users
+    [authorize(tokenTypes.ACCESS, 'ADMIN_ROLE', 'USER_ROLE')],
+    userGet
+  );
+
+router
+  .route('/:id')
+  .get(
+    [
+      authorize(tokenTypes.ACCESS, 'ADMIN_ROLE', 'USER_ROLE', 'SALES_ROLE'),
+      check('id', 'Id is not valid').isMongoId(),
+      check('id').custom(existsID),
+      fieldValidation,
+    ],
+    userGetOne
+  )
+  .patch(
+    [
+      authorize(tokenTypes.ACCESS, 'ADMIN_ROLE'),
+      check('id', 'Id is not valid').isMongoId(),
+      check('id').custom(existsID),
+      check('email', 'Invalid email').optional().isEmail(),
+      check('email').optional().custom(isEmailUnique),
+      check('password').optional().custom(weakPassword),
+      check('role').optional().custom(isValidRol),
+      fieldValidation,
+    ],
+    userPatch
+  )
+  .delete(
+    [
+      authorize(tokenTypes.ACCESS, 'ADMIN_ROLE'),
+      check('id', 'Id is empty').not().isEmpty(),
+      check('id', 'Id is not valid').isMongoId(),
+      check('id').custom(existsID),
+      fieldValidation,
+    ],
+    userDelete
+  );
+
+// eslint-disable-next-line import/prefer-default-export
+export { router as userRouter };
+
 /**
  * @swagger
  * tags:
@@ -118,11 +164,7 @@ const router = Router();
  *         $ref: '#/components/schemas/Error'
  */
 
-router.route('/').get(
-  // get all users
-  [authorize(tokenTypes.ACCESS, 'ADMIN_ROLE', 'USER_ROLE')],
-  userGet
-);
+
 // .post(
 //   // create user
 //   [
@@ -285,40 +327,3 @@ router.route('/').get(
  *         $ref: '#/components/schemas/Error'
  */
 
-router
-  .route('/:id')
-  .get(
-    [
-      authorize(tokenTypes.ACCESS, 'ADMIN_ROLE', 'USER_ROLE', 'SALES_ROLE'),
-      check('id', 'Id is not valid').isMongoId(),
-      check('id').custom(existsID),
-      fieldValidation,
-    ],
-    userGetOne
-  )
-  .patch(
-    [
-      authorize(tokenTypes.ACCESS, 'ADMIN_ROLE'),
-      check('id', 'Id is not valid').isMongoId(),
-      check('id').custom(existsID),
-      check('email', 'Invalid email').optional().isEmail(),
-      check('email').optional().custom(isEmailUnique),
-      check('password').optional().custom(weakPassword),
-      check('role').optional().custom(isValidRol),
-      fieldValidation,
-    ],
-    userPatch
-  )
-  .delete(
-    [
-      authorize(tokenTypes.ACCESS, 'ADMIN_ROLE'),
-      check('id', 'Id is empty').not().isEmpty(),
-      check('id', 'Id is not valid').isMongoId(),
-      check('id').custom(existsID),
-      fieldValidation,
-    ],
-    userDelete
-  );
-
-// eslint-disable-next-line import/prefer-default-export
-export { router as userRouter };

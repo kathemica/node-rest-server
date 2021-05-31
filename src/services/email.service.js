@@ -1,17 +1,8 @@
 import sgMail from '@sendgrid/mail';
 
-import { emailConfig, logger, SERVER_URL } from '../config/index.js';
+import { emailConfig, logger, serverConfig } from '../config/index.js';
 
 sgMail.setApiKey(emailConfig.SENDGRID_API_KEY);
-
-// const transport = nodemailer.createTransport(emailConfig.smtp);
-/* istanbul ignore next */
-// if (env !== 'test') {
-//   sgMail
-//     .verify()
-//     .then(() => logger.info('Connected to email server'))
-//     .catch(() => logger.warn('Unable to connect to email server. Make sure you have configured the SMTP options in .env'));
-// }
 
 /**
  * Send an email
@@ -23,7 +14,7 @@ sgMail.setApiKey(emailConfig.SENDGRID_API_KEY);
  */
 const sendEmail = async (to = '', subject = '', text = '') => {
   const msg = {
-    from: emailConfig.from,
+    from: emailConfig.FROM,
     to,
     subject,
     text,
@@ -32,7 +23,7 @@ const sendEmail = async (to = '', subject = '', text = '') => {
   await sgMail
     .send(msg)
     .then(() => {
-      logger.info(`Email sent to ${to} about ${subject}`);
+      logger.info(`Email sent.`);
     })
     .catch((error) => {
       logger.error(error);
@@ -48,10 +39,8 @@ const sendEmail = async (to = '', subject = '', text = '') => {
 const sendResetPasswordEmail = async (to, token) => {
   const subject = 'Reset password';
   // replace this url with the link to the reset password page of your front-end app
-  const resetPasswordUrl = `${SERVER_URL}/api/auths/reset-password/${token}`;
-  const text = `Dear user,
-To reset your password, click on this link: ${resetPasswordUrl}
-If you did not request any password resets, then ignore this email.`;
+  const resetPasswordUrl = `${serverConfig.SERVER_URL}/api/auths/reset-password/${token}`;
+  const text = `Dear user, To reset your password, click on this link: ${resetPasswordUrl} \nIf you did not request any password resets, then ignore this email.`;
   await sendEmail(to, subject, text);
 };
 
@@ -64,7 +53,7 @@ If you did not request any password resets, then ignore this email.`;
 const sendVerificationEmail = async (to, token) => {
   const subject = 'Email Verification';
   // replace this url with the link to the email verification page of your front-end app
-  const verificationEmailUrl = `${SERVER_URL}/api/auths/verify-email/${token}`;
+  const verificationEmailUrl = `${serverConfig.SERVER_URL}/api/auths/verify-email/${token}`;
   const text = `Dear user, To verify your email, click on this link: ${verificationEmailUrl} \nIf you did not create an account, then ignore this email.`;
   await sendEmail(to, subject, text);
 };

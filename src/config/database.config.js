@@ -3,14 +3,14 @@ import mongoose from 'mongoose';
 import fs from 'fs';
 
 import { logger } from './logger.js';
-import { mongooseConfig } from './app.config.js';
+import { mongooseConfig } from './env.config.js';
 
-const dbConnection = async () => {
+const mongooseDbConnection = async () => {
   try {
-    const sslCA = mongooseConfig.is_tls === true ? [fs.readFileSync(mongooseConfig.CA_CERT, 'utf-8')] : '';
-    const sslPass = mongooseConfig.is_tls === true ? mongooseConfig.CA_TOKEN : '';
-    const sslKey = mongooseConfig.is_tls === true ? fs.readFileSync(mongooseConfig.KEY_CERT, 'utf-8') : '';
-    const sslCert = mongooseConfig.is_tls === true ? fs.readFileSync(mongooseConfig.PEM_CERT, 'utf-8') : '';
+    const sslCA = mongooseConfig.IS_TLS === true ? [fs.readFileSync(mongooseConfig.CA_CERT, 'utf-8')] : '';
+    const sslPass = mongooseConfig.IS_TLS === true ? mongooseConfig.CA_TOKEN : '';
+    const sslKey = mongooseConfig.IS_TLS === true ? fs.readFileSync(mongooseConfig.KEY_CERT, 'utf-8') : '';
+    const sslCert = mongooseConfig.IS_TLS === true ? fs.readFileSync(mongooseConfig.PEM_CERT, 'utf-8') : '';
 
     const options = {
       sslCA,
@@ -20,7 +20,7 @@ const dbConnection = async () => {
       ssl: true,
     };
 
-    await mongoose.connect(mongooseConfig.url, { ...options, ...mongooseConfig.options });
+    await mongoose.connect(mongooseConfig.URL, { ...options, ...mongooseConfig.options });
 
     logger.info('Connected to MongoDB');
   } catch (error) {
@@ -31,4 +31,4 @@ const dbConnection = async () => {
 };
 
 // eslint-disable-next-line import/prefer-default-export
-export { dbConnection };
+export { mongooseDbConnection as dbConnection};

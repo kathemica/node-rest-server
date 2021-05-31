@@ -1,11 +1,14 @@
 import express from 'express';
+import https from 'https';
+import fs from 'fs';
 import cors from 'cors';
 import helmet from 'helmet';
 import httpStatus from 'http-status';
 import Fingerprint from 'express-fingerprint';
+import Ddos from 'ddos';
 
 import { responseObjectBuilder } from './utils/index.js';
-import { PORT, env, dbConnection, logger, SERVER_URL, SERVER_FINGERKEY } from './config/index.js';
+import { ENV, serverConfig, dbConnection, logger } from './config/index.js';
 import { userRouter, authRouter, docsRouter } from './routes/index.js';
 
 class App {
@@ -17,21 +20,24 @@ class App {
 
   #connection = null;
 
+  #isSecureServer;
+
   userPath = '';
 
   authPath = '';
 
   docAPIPath = '';
 
-  constructor() {
+  constructor(isSecureServer = false) {
     this.userAPIPath = '/api/users';
     this.authAPIPath = '/api/auths';
     this.docAPIPath = '/api-docs';
+    this.#isSecureServer = isSecureServer;
 
     // config
     this.#app = express();
 
-    this.#port = PORT;
+    this.#port = serverConfig.PORT;
 
     this.#connectDB();
 
@@ -53,7 +59,7 @@ class App {
     this.#app.use(this.authAPIPath, authRouter);
     this.#app.use(this.userAPIPath, userRouter);
 
-    if (env === 'development') {
+    if (ENV === 'development') {
       this.#app.use(this.docAPIPath, docsRouter);
     }
 
@@ -72,6 +78,19 @@ class App {
 
   #middlewares() {
     // middlewares
+    //adding ddos defense
+    const onDenial = function (req) {
+      logger.warning('DDOS from ', req);
+    };
+
+    var ddos = new Ddos({
+      burst:10,
+      limit:15,
+      whitelist:['10.0.0.101', 'localhost', '201.216.223.47'], onDenial
+    });
+
+    this.#app.use(ddos.express);
+
     // CORS: enable petition when using several services at same App
     this.#app.use(cors());
 
@@ -90,7 +109,7 @@ class App {
           // Additional parameters
           function (next) {
             next(null, {
-              param1: SERVER_FINGERKEY,
+              param1: serverConfig.SERVER_FINGERKEY,
             });
           },
           // function (next) {
@@ -119,9 +138,27 @@ class App {
   }
 
   start() {
-    this.#server = this.#app.listen(this.#port, () => {
-      logger.info(`App is running at: ${SERVER_URL}`);
-    });
+    try {
+      if (this.#isSecureServer){
+        const httpsServerOptions = {
+          'key': fs.readFileSync(serverConfig.KEY_PEM),
+          'cert': fs.readFileSync(serverConfig.CERT_PEM),
+        }
+
+        this.#server = https
+                        .createServer(httpsServerOptions, this.#app)
+                        .listen(this.#port, () => {
+                          logger.info(`App is running at: ${serverConfig.URL}`);
+                        });
+      }else{
+        this.#server = this.#app.listen(this.#port, () => {
+          logger.info(`App is running at: ${serverConfig.URL}`);
+        });
+      }
+    } catch (error) {
+      logger.error(error);
+      this.close();
+    }
   }
 
   close() {

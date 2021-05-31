@@ -107,4 +107,5 @@ dist
 /certs/server_root_CA.crt
 /certs/client.pem
 /certs/client.key
-/src/doc/components copy.yml
+/certs/https/key.pem
+/certs/https/cert.pem

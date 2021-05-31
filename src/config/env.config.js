@@ -13,8 +13,11 @@ const envVarsSchema = Joi.object()
       .default(process.env.INIT_CWD || '')
       .description('Base app path'),
     SERVER_FINGERKEY: Joi.string().description('Server Random Key '),
-    SERVER_URL: Joi.string().description('Base app path'),
+    SERVER_URL: Joi.string().description('Public url path'),
+    SECURE_SERVER_URL: Joi.string().description('Secure url path'),
     PORT: Joi.number().default(8080),
+    isHTTPS: Joi.boolean().default(false),
+    SECURE_PORT: Joi.number().default(443),
     MONGO_URL: Joi.string()
       .default(process.env.MONGO_URL || '')
       .description('Mongo DB url')
@@ -35,11 +38,11 @@ const envVarsSchema = Joi.object()
     MAIL_USERNAME: Joi.string().description('username for email server'),
     MAIL_FROM: Joi.string().description('the from field in the emails sent by the app'),
     SENDGRID_API_KEY: Joi.string().default('').description('SENDGRID_API_KEY'),
-    CA_CERT: Joi.string().default('').description('The path for CA Cert file'),
-    KEY_CERT: Joi.string().default('').description('The path for Key Cert file'),
-    PEM_CERT: Joi.string().default('').description('The path for PEM Cert file'),
-    CA_TOKEN: Joi.string().default('').description('The key for open CA cert file'),
-    IS_TLS: Joi.boolean().default(false).description('Should I Use TLS for mongo?'),
+    CA_CERT_MONGO: Joi.string().default('').description('The path for CA Cert file'),
+    KEY_CERT_MONGO: Joi.string().default('').description('The path for Key Cert file'),
+    PEM_CERT_MONGO: Joi.string().default('').description('The path for PEM Cert file'),
+    CA_TOKEN_MONGO: Joi.string().default('').description('The key for open CA cert file'),
+    IS_TLS_MONGO: Joi.boolean().default(false).description('Should I Use TLS for mongo?'),
     GOOGLE_CLIENT_ID: Joi.string().description('Cliend ID for google Auth API '),
     GOOGLE_SECRET_ID: Joi.string().description('The key for access Google API Service'),
     npm_package_version: Joi.string().default('').description('Version from package.json'),
@@ -53,38 +56,45 @@ if (error) {
 }
 
 const { APP_PATH } = envVars;
+
+const ENV = envVars.NODE_ENV;
 const VERSION = envVars.npm_package_version;
-const env = envVars.NODE_ENV;
-const { PORT } = envVars;
-const { SERVER_FINGERKEY } = envVars;
-const SERVER_URL = `${envVars.SERVER_URL}`;
+
+const serverConfig = {
+  SERVER_FINGERKEY: envVars.SERVER_FINGERKEY,
+  isHTTPS: envVars.isHTTPS || false,
+  PORT: envVars.isHTTPS ? envVars.SECURE_PORT : envVars.PORT,
+  URL: envVars.isHTTPS ? envVars.SECURE_SERVER_URL : envVars.SERVER_URL,
+  KEY_PEM: envVars.isHTTPS ? envVars.KEY_PEM_HTTPS : '',
+  CERT_PEM: envVars.isHTTPS ? envVars.CERT_PEM_HTTPS : '',
+}
 
 const emailConfig = {
-  owner: envVars.MAIL_OWNER,
-  username: envVars.MAIL_USERNAME,
-  from: envVars.MAIL_FROM,
+  OWNER: envVars.MAIL_OWNER,
+  USERNAME: envVars.MAIL_USERNAME,
+  FROM: envVars.MAIL_FROM,
   SENDGRID_API_KEY: envVars.SENDGRID_API_KEY,
 };
 
 const mongooseConfig = {
-  url: envVars.MONGO_URL + (envVars.NODE_ENV === 'test' ? '-test' : ''),
-  is_tls: envVars.IS_TLS,
-  CA_CERT: envVars.CA_CERT,
-  CA_TOKEN: envVars.CA_TOKEN,
-  KEY_CERT: envVars.KEY_CERT,
-  PEM_CERT: envVars.PEM_CERT,
+  URL: envVars.MONGO_URL + (envVars.NODE_ENV === 'test' ? '-test' : ''),
+  IS_TLS: envVars.IS_TLS_MONGO,
+  CA_CERT: envVars.CA_CERT_MONGO,
+  CA_TOKEN: envVars.CA_TOKEN_MONGO,
+  KEY_CERT: envVars.KEY_CERT_MONGO,
+  PEM_CERT: envVars.PEM_CERT_MONGO,
   options: {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
     useFindAndModify: false,
     sslValidate: false,
-    tlsAllowInvalidHostnames: true,
+    tlsAllowInvalidHostnames: true
   },
 };
 
 const jwtConfig = {
-  secret: envVars.JWT_SECRET,
+  SECRET: envVars.JWT_SECRET,
   accessExpirationMinutes: envVars.JWT_ACCESS_EXPIRATION_MINUTES,
   refreshExpirationDays: envVars.JWT_REFRESH_EXPIRATION_DAYS,
   resetPasswordExpirationMinutes: envVars.JWT_RESET_PASSWORD_EXPIRATION_MINUTES,
@@ -97,4 +107,4 @@ const googleConfig = {
 };
 
 // eslint-disable-next-line import/prefer-default-export
-export { emailConfig, SERVER_FINGERKEY, APP_PATH, VERSION, env, PORT, SERVER_URL, mongooseConfig, jwtConfig, googleConfig };
+export { APP_PATH, VERSION, ENV, serverConfig, emailConfig,  mongooseConfig, jwtConfig, googleConfig };

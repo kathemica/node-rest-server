@@ -15,6 +15,7 @@
 ![GitHub top language](https://img.shields.io/github/languages/top/kathemica/node-rest-server?style=plastic)
 <br>
 ![Maintaned](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=plastic)
+![OWASP](https://img.shields.io/badge/OWASP_Applied%3F-yes-green.svg?style=plastic)
 [![GitHub license](https://img.shields.io/github/license/kathemica/node-rest-server?style=plastic)](https://github.com/kathemica/node-rest-server/blob/main/LICENSE)
 ![GitHub repo size](https://img.shields.io/github/repo-size/kathemica/node-rest-server?style=plastic)
 <br>

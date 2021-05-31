@@ -8,7 +8,7 @@ import { verifyToken } from '../services/token.service.js';
 const isValidRol = async (role = '') => {
   const isValidRole = await Roles.findOne({ role });
   if (!isValidRole) {
-    throw new Error(`Role ${role} is invalid`);
+    throw new Error(`Role is invalid`);
   }
 };
 
@@ -16,7 +16,7 @@ const isValidRol = async (role = '') => {
 const isEmailUnique = async (email = '') => {
   const exists = await Users.findOne({ email });
   if (exists) {
-    throw new Error(`Email ${email} already taken`);
+    throw new Error(`Email already taken`);
   }
 };
 
@@ -24,7 +24,7 @@ const isEmailUnique = async (email = '') => {
 const existsID = async (id = '') => {
   const exists = await Users.findById(id);
   if (!exists) {
-    throw new Error(`User with ID ${id} doesn't exists in db`);
+    throw new Error(`User with doesn't exists in db`);
   }
 };
 
@@ -45,7 +45,7 @@ const isValidEmailToken = async (token = '') => {
   const payload = await verifyToken(token, tokenTypes.VERIFY_EMAIL);
 
   if (!payload) {
-    throw new Error(`Token doesn't exists in db`);
+    throw new Error(`Invalid token`);
   }
 
   return true;
@@ -56,7 +56,7 @@ const isValidResetToken = async (token = '') => {
   const payload = await verifyToken(token, tokenTypes.RESET_PASSWORD);
 
   if (!payload) {
-    throw new Error(`Token doesn't exists in db`);
+    throw new Error(`Invalid token`);
   }
 
   return true;
