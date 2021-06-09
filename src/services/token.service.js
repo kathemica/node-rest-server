@@ -44,7 +44,12 @@ const saveToken = async (token, userId, fingerprint, expires, type = '', blackli
  */
 const verifyToken = async (token = '', type = tokenTypes, fingerprint = '') => {
   try {
-    const payload = jwt.verify(token, jwtConfig.SECRET);
+    const payload = jwt.verify(token, jwtConfig.SECRET, (err, decoded) => {
+      if (err){
+        throw new ApiError(httpStatus.UNAUTHORIZED, `Invalid token`);
+      }
+      return decoded;
+    });
 
     // eslint-disable-next-line prefer-const
     let query = { token, type, user: payload.sub, blacklisted: false };
@@ -56,7 +61,7 @@ const verifyToken = async (token = '', type = tokenTypes, fingerprint = '') => {
 
     return tokenDoc;
   } catch (err) {
-    logger.error(err);
+    // logger.error(err);
     throw new ApiError(httpStatus.UNAUTHORIZED, `Failure on Security Token, [${err.message}]`);
   }
 };
@@ -123,7 +128,7 @@ const getRefreshToken = async (user, fingerprint) => {
   // We validate that it does not have more than 5 RTs in total, else we delete them to create a new one
   if (RTTotalGeneral >= 5) {
     await deleteUserTokens(queries.RTTotalGeneral).then(
-      logger.warning(
+      logger.warn(
         `User: ${user.id} was trying to create more than enabled refresh tokens.`
       )
     );

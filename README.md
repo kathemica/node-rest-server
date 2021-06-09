@@ -30,3 +30,8 @@ Autor
 
 You can watch this project running at <br>
 <b>https://node-rest-keam.herokuapp.com/</b>
+
+For HTTPS Certs use this
+```
+openssl req -newkey rsa:4096 -new nodes -x509 -days 3650 -keyout key.pem -out cert.pem
+```

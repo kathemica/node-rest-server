@@ -1,11 +1,7 @@
-/* eslint-disable security/detect-non-literal-fs-filename */
-import mongoose from 'mongoose';
-import fs from 'fs';
-
 import { logger } from './logger.js';
 import { mongooseConfig } from './env.config.js';
 
-const mongooseDbConnection = async () => {
+const mongooseDbConnection = async (mongoose, fs) => {
   try {
     const sslCA = mongooseConfig.IS_TLS === true ? [fs.readFileSync(mongooseConfig.CA_CERT, 'utf-8')] : '';
     const sslPass = mongooseConfig.IS_TLS === true ? mongooseConfig.CA_TOKEN : '';

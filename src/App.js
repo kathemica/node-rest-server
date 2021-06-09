@@ -1,16 +1,4 @@
-import express from 'express';
-import https from 'https';
-import fs from 'fs';
-import cors from 'cors';
-import helmet from 'helmet';
-import httpStatus from 'http-status';
-import Fingerprint from 'express-fingerprint';
-import Ddos from 'ddos';
-
-import { responseObjectBuilder } from './utils/index.js';
-import { ENV, serverConfig, dbConnection, logger } from './config/index.js';
-import { userRouter, authRouter, docsRouter } from './routes/index.js';
-
+// Dependency Injections pattern
 class App {
   #app = null;
 
@@ -20,54 +8,55 @@ class App {
 
   #connection = null;
 
-  #isSecureServer;
+  #environment = {};
 
-  userPath = '';
+  userAPIPath = '';
 
-  authPath = '';
+  authAPIPath = '';
 
   docAPIPath = '';
 
-  constructor(isSecureServer = false) {
+  constructor (classArgs, cors) {
     this.userAPIPath = '/api/users';
     this.authAPIPath = '/api/auths';
     this.docAPIPath = '/api-docs';
-    this.#isSecureServer = isSecureServer;
+    this.#environment = classArgs;
 
     // config
-    this.#app = express();
+    this.#app = this.#environment['express']();
 
-    this.#port = serverConfig.PORT;
+    this.#port = this.#environment['env'].serverConfig.PORT;
 
     this.#connectDB();
 
-    this.#middlewares();
+    this.#middlewares(cors);
 
     this.#routes();
   }
 
-  #connectDB() {
+  async #connectDB() {
     try {
-      this.#connection = dbConnection();
+      this.#connection =  await this.#environment['dbConnection'](this.#environment['middlewares']['database'], this.#environment['middlewares']['files']);
+      this.#environment['utils']['logs'].info('Connected to databse')
     } catch (error) {
-      logger.error(`Error loading db, details:${error}`);
+      this.#environment['utils']['logs'].error(`Error loading db, details:${error}`);
     }
   }
 
   #routes() {
     // adding routes to App
-    this.#app.use(this.authAPIPath, authRouter);
-    this.#app.use(this.userAPIPath, userRouter);
+    this.#app.use(this.authAPIPath, this.#environment['routes']['auth']);
+    this.#app.use(this.userAPIPath, this.#environment['routes']['user']);
 
-    if (ENV === 'development') {
-      this.#app.use(this.docAPIPath, docsRouter);
+    if (this.#environment['env'].ENV === 'development') {
+      this.#app.use(this.docAPIPath, this.#environment['routes']['swagger']);
     }
 
     this.#app.use((req, res, next) => {
       next(
-        responseObjectBuilder(
+        this.#environment['utils']['ROB'](
           res,
-          httpStatus.NOT_IMPLEMENTED,
+          this.#environment['imports']['status'].NOT_IMPLEMENTED,
           'Fail',
           'Not enabled',
           'Resource you require is not implemented.'
@@ -76,14 +65,14 @@ class App {
     });
   }
 
-  #middlewares() {
+  #middlewares(cors) {
     // middlewares
     //adding ddos defense
     const onDenial = function (req) {
-      logger.warning('DDOS from ', req);
+      this.#environment['utils']['logs'].warning('DDOS from ', req);
     };
 
-    var ddos = new Ddos({
+    var ddos = new this.#environment['middlewares']['antiDDos']({
       burst:10,
       limit:15,
       whitelist:['10.0.0.101', 'localhost', '201.216.223.47'], onDenial
@@ -94,44 +83,40 @@ class App {
     // CORS: enable petition when using several services at same App
     this.#app.use(cors());
 
-    // set security HTTP headers
-    this.#app.use(helmet());
-
+    // set security HTTP headers with helmet
+    this.#app.use(this.#environment['middlewares']['protect']());
     // remembering browser
+    const fingerPrints= this.#environment['env'].serverConfig.SERVER_FINGERKEY;
+
     this.#app.use(
-      Fingerprint({
+      this.#environment['middlewares']['finger_Print']({
         parameters: [
           // Defaults
-          Fingerprint.useragent,
-          Fingerprint.acceptHeaders,
+          this.#environment['middlewares']['finger_Print'].useragent,
+          this.#environment['middlewares']['finger_Print'].acceptHeaders,
           // Fingerprint.geoip,
 
-          // Additional parameters
-          function (next) {
+          // personalized params
+          (next) => {
             next(null, {
-              param1: serverConfig.SERVER_FINGERKEY,
+              fingerprint: fingerPrints,
             });
           },
-          // function (next) {
-          //   next(null, {
-          //     param2: 'value2',
-          //   });
-          // },
         ],
       })
     );
 
     // parsing body
-    this.#app.use(express.json());
+    this.#app.use(this.#environment['express'].json());
     this.#app.use(
-      express.urlencoded({
+      this.#environment['express'].urlencoded({
         extended: true,
       })
     );
 
     // adding public folder
     this.#app.use(
-      express.static('public', {
+      this.#environment['express'].static('public', {
         extensions: ['html'],
       })
     );
@@ -139,24 +124,24 @@ class App {
 
   start() {
     try {
-      if (this.#isSecureServer){
+      if (this.#environment['env'].serverConfig.isHTTPS){
         const httpsServerOptions = {
-          'key': fs.readFileSync(serverConfig.KEY_PEM),
-          'cert': fs.readFileSync(serverConfig.CERT_PEM),
+          'key': this.#environment['middlewares']['files'].readFileSync(this.#environment['env'].serverConfig.KEY_PEM),
+          'cert': this.#environment['middlewares']['files'].readFileSync(this.#environment['env'].serverConfig.CERT_PEM),
         }
 
-        this.#server = https
+        this.#server = this.#environment['middlewares']['tls']
                         .createServer(httpsServerOptions, this.#app)
                         .listen(this.#port, () => {
-                          logger.info(`App is running at: ${serverConfig.URL}`);
+                          this.#environment['utils']['logs'].info(`App is running at: ${this.#environment['env'].serverConfig.URL}`);
                         });
       }else{
         this.#server = this.#app.listen(this.#port, () => {
-          logger.info(`App is running at: ${serverConfig.URL}`);
+          this.#environment['utils']['logs'].info(`App is running at: ${this.#environment['env'].serverConfig.URL}`);
         });
       }
     } catch (error) {
-      logger.error(error);
+      this.#environment['utils']['logs'].error('error', error);
       this.close();
     }
   }
@@ -164,7 +149,7 @@ class App {
   close() {
     if (this.#server) {
       this.#server.close(() => {
-        logger.info('Server closed');
+        this.#environment['utils']['logs'].info('Server closed');
         process.exit(1);
       });
     } else {
